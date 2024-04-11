@@ -1,5 +1,7 @@
 # Sustav-rezervacija-dvorana
 
+Potrebni paketi: [Node.js](https://nodejs.org/en/download/current), [VS Code](https://code.visualstudio.com/download), [Github Desktop](https://desktop.github.com/) (Za commit na repozitorij)
+
 ## Prvi put pokretanje
 Napisat sljedeće komande u Git (bash) u vs codu.
 
