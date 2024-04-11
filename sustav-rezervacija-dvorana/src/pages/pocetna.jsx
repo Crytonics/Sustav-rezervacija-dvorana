@@ -29,6 +29,9 @@ function pocetna() {
         <li><Link to="/studijskiProgramiAdministrator">Go to StudijskiProgramiAdministrator</Link></li>
         <li><Link to="/unosStudijskihProgramaAdministrator">Go to UnosStudijskihProgramaAdministrator</Link></li>
         <li><Link to="/azuriranjeStudijskihProgramaAdministrator">Go to AzuriranjeStudijskihProgramaAdministrator</Link></li>
+        <li><Link to="/unosDvoranaAdministrator">Go to UnosDvoranaAdministrator</Link></li>
+        <li><Link to="/azuriranjeDvoranaAdministrator">Go to AzuriranjeDvoranaAdministrator</Link></li>
+        <li><Link to="/odobravanjeTerminaDvoranaAdministrator">Go to OdobravanjeTerminaDvoranaAdministrator</Link></li>
         </>
         
     )

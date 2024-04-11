@@ -26,6 +26,9 @@ import AzuriranjeKolegijaAdministrator from "./pages/Administrator/AzuriranjeKol
 import StudijskiProgramiAdministrator from "./pages/Administrator/StudijskiProgramiAdministrator";
 import UnosStudijskihProgramaAdministrator from "./pages/Administrator/UnosStudijskihProgramaAdministrator";
 import AzuriranjeStudijskihProgramaAdministrator from "./pages/Administrator/AzuriranjeStudijskihProgramaAdministrator";
+import UnosDvoranaAdministrator from "./pages/Administrator/UnosDvoranaAdministrator";
+import AzuriranjeDvoranaAdministrator from "./pages/Administrator/AzuriranjeDvoranaAdministrator";
+import OdobravanjeTerminaDvoranaAdministrator from "./pages/Administrator/OdobravanjeTerminaDvoranaAdministrator";
 
 function App() {
   return (
@@ -57,6 +60,9 @@ function App() {
         <Route path="studijskiProgramiAdministrator" element={<StudijskiProgramiAdministrator />} />
         <Route path="unosStudijskihProgramaAdministrator" element={<UnosStudijskihProgramaAdministrator />} />
         <Route path="azuriranjeStudijskihProgramaAdministrator" element={<AzuriranjeStudijskihProgramaAdministrator />} />
+        <Route path="unosDvoranaAdministrator" element={<UnosDvoranaAdministrator />} />
+        <Route path="azuriranjeDvoranaAdministrator" element={<AzuriranjeDvoranaAdministrator />} />
+        <Route path="odobravanjeTerminaDvoranaAdministrator" element={<OdobravanjeTerminaDvoranaAdministrator />} />
       </Routes>
     </BrowserRouter>
   );
