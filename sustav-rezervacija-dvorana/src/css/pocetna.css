@@ -1,0 +1,78 @@
+.calendar-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 290px;
+    margin-top: -60px;
+}
+
+.calendar-grid {
+    width: 10%;
+    height: auto;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 days in a week */
+    grid-gap: 5px; /* Adjust based on your design */
+    padding-bottom: 30px;
+}
+
+ 
+.calendar-day-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+}
+  
+.calendar-day {
+    border: 1px solid #ddd;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    aspect-ratio: 1 / 1;
+    width: 15%;
+    min-width: 15px;
+    min-height: 15px; 
+}
+  
+.empty {
+    background-color: #414141;
+}
+  
+.current-day {
+    background-color: rgb(204, 204, 0.5); /* Highlight the current day */
+}
+  
+table {
+    width: 100%; /* Make the table use the full width of its container */
+    border-collapse: collapse; /* Optional: Collapses border to avoid double borders */
+}
+  
+.th_pocetna, .td_pocetna {
+    border: 1px solid #ddd; /* Light grey border for readability */
+    text-align: center; /* Align text to the left. Adjust as needed */
+    padding: 0px; /* Add some padding for content inside cells */
+}
+  
+.th_pocetna {
+    background-color: #008cff; /* Light grey background for header cells */
+}
+  
+th:first-child, td:first-child {
+    width: 5%; /* Adjust this percentage to make the time column narrower */
+}
+
+
+/* Adjust the width of the other columns */
+th:not(:first-child), td:not(:first-child) {
+    width: calc(95% / 5); /* Distribute the remaining width among the other columns */
+}
+
+.datum_pocetna {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    bottom: -200px;
+}
