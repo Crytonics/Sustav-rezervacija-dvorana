@@ -1,6 +1,6 @@
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 
-export default function UnosRezervacijaDvoranaAdministrator() {
+export default function AzuriranjeSvojihRezervacija() {
 
     const navigate = useNavigate();
 
@@ -23,19 +23,10 @@ export default function UnosRezervacijaDvoranaAdministrator() {
         <div className="unos-korisnika-container">
         <form className="login-form">
             <div className="form-group">
-                <label htmlFor="Nastavnik">Nastavnik: </label>
-                <select id="Nastavnik" name="Nastavnik" required>
-                    <option value="">Odaberite nastavnika</option>
-                    <option value="nastavnik1">Primjer Izvođača</option>
-                    <option value="nastavnik2">Primjer Izvođača 2</option>
-                    <option value="nastavnik3">Primjer Izvođača 3</option>
-                </select>
-            </div>
-            <div className="form-group">
                 <label htmlFor="Nastavnik">Kolegij: </label>
                 <select id="Kolegij" name="Kolegij" required>
                     <option value="">Odaberite kolegij</option>
-                    <option value="Kolegij1">Informatika</option>
+                    <option value="Kolegij1" selected>Informatika</option>
                     <option value="Kolegij2">Telematika</option>
                     <option value="Kolegij3">Promet</option>
                 </select>
@@ -44,7 +35,7 @@ export default function UnosRezervacijaDvoranaAdministrator() {
                 <label htmlFor="Dvorana">Dvorana: </label>
                 <select id="Dvorana" name="Dvorana" required>
                     <option value="">Odaberite kolegij</option>
-                    <option value="Dvorana1">Dvorana 1</option>
+                    <option value="Dvorana1" selected>Dvorana 1</option>
                     <option value="Dvorana2">Dvorana 2</option>
                     <option value="Dvorana3">Dvorana 3</option>
                 </select>
@@ -53,7 +44,7 @@ export default function UnosRezervacijaDvoranaAdministrator() {
                 <label htmlFor="Razlog">Razlog: </label>
                 <select id="Razlog" name="Razlog" required>
                     <option value="">Odaberite kolegij</option>
-                    <option value="Razlog1">Predavanja</option>
+                    <option value="Razlog1" selected>Predavanja</option>
                     <option value="Razlog2">Ispit</option>
                 </select>
             </div>
