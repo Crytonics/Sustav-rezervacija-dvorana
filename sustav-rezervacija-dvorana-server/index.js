@@ -57,9 +57,51 @@ app.post('/UnosKorisnikaAdministrator', function (request, response) {
   });
 });
 // Unos novog studijskog programa (tablica "studijskiProgrami")
+app.post('/UnosStudijskihProgramaAdministrator', function (request, response) {
+  const data = request.body;
+  studijskiprogram = [[data.id_StudijskogPrograma, data.naziv]]
+  connection.query('INSERT INTO studijskiProgrami (id_StudijskogPrograma, naziv) VALUES ?',
+  [studijskiprogram], function (error, results, fields) {
+    if (error) throw error;
+    console.log('data', data)
+    return response.send({ error: false, data: results, message: 'Korisnik je dodan.' });
+  });
+});
 // Unos novog kolegija (tablica "kolegij")
+app.post('/UnosStudijskihProgramaAdministrator', function (request, response) {
+  const data = request.body;
+  novikolegij = [[data.id_kolegija, data.naziv,  data.id_korisnika, data.id_StudijskogPrograma]]
+  connection.query('INSERT INTO korisnci (id_kolegija, naziv) VALUES ?',
+  [novikolegij], function (error, results, fields) {
+    if (error) throw error;
+    console.log('data', data)
+    return response.send({ error: false, data: results, message: 'Korisnik je dodan.' });
+  });
+});
 // Unos nove dvorane (tablica "dvorane")
+app.post('/UnosDvoranaAdministrator', function (request, response) {
+  const data = request.body;
+  dvorana = [[data.id_dvorane, data.naziv,  data.opis, data.svrha]]
+  connection.query('INSERT INTO dvorane (id_dvorane, naziv, opis, svrha) VALUES ?',
+  [dvorana], function (error, results, fields) {
+    if (error) throw error;
+    console.log('data', data)
+    return response.send({ error: false, data: results, message: 'Korisnik je dodan.' });
+  });
+});
 // Prelged/Dohvati zauzeća dvorane (tablica "entry")
+app.get("/api/entry/:id", (req, res) => {
+  const { id } = req.params;
+
+  connection.query(
+      "SELECT id_entry, naziv, tip, opis, status, start_time, end_time, id_dvorane, id_korisnik, id_kolegij, id_studijskiProgrami",
+      [id],
+      (error, results) => {
+          if (error) throw error;
+          res.send(results);
+      }
+  );
+});
 // Pregled/Dohvati popis nastavnika (tablica "korisnici") (uloga = nastavnik)
 // Pregled/Dohvati dvorane (tablica "dvorane")
 // Pregled/Dohvati kolegiji (tablica "kolegij")
