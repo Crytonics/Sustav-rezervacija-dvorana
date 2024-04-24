@@ -46,6 +46,16 @@ app.get("/api/korisnici", authJwt.verifyTokenAdmin, (req, res) => {
 
 // login
 // Unos novog korisnika (tablica "korisnici")
+app.post('/UnosKorisnikaAdministrator', function (request, response) {
+  const data = request.body;
+  korisnik = [[data.id_korisnik, data.korisničko_ime,  data.ime, data.prezime, data.lozinka, data.uloga]]
+  connection.query('INSERT INTO korisnci (id_korisnik, korisnicko_ime, ime, prezime, lozinka, uloga) VALUES ?',
+  [korisnik], function (error, results, fields) {
+    if (error) throw error;
+    console.log('data', data)
+    return response.send({ error: false, data: results, message: 'Korisnik je dodan.' });
+  });
+});
 // Unos novog studijskog programa (tablica "studijskiProgrami")
 // Unos novog kolegija (tablica "kolegij")
 // Unos nove dvorane (tablica "dvorane")
