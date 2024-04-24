@@ -48,12 +48,48 @@ verifyTokenUser = (req, res, next) => {
       });
     }
     req.userId = decoded.id;
+    /*     req.role = decoded.uloga; // Assign the role to the request object */
+    if (decoded.uloga === "nastavnik") {
+      next();
+    } else {
+      res.status(403).send({
+        message: "Require nastavnik Role!",
+      });
+    }
   });
-  next();
+};
+
+verifyTokenAdminOrUser = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (!token) {
+    return res.status(403).send({
+      message: "No token provided!",
+    });
+  }
+
+  jwt.verify(token, config.secret, (err, decoded) => {
+    if (err) {
+      return res.status(401).send({
+        message: "Unauthorized!",
+      });
+    }
+    req.userId = decoded.id;
+    // Check if the role is either admin or user
+    if (decoded.uloga === "admin" || decoded.uloga === "nastavnik") {
+      next();
+    } else {
+      res.status(403).send({
+        message: "Require Admin or nastavnik Role!",
+      });
+    }
+  });
 };
 
 const authJwt = {
   verifyTokenAdmin: verifyTokenAdmin,
   verifyTokenUser: verifyTokenUser,
+  verifyTokenAdminOrUser: verifyTokenAdminOrUser,
 };
 module.exports = authJwt;
