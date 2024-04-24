@@ -66,6 +66,10 @@ export default function ZatraziRezervacijuNastavnici() {
                     {generateTimeOptions()}
                 </select>
             </div>
+            <div className="form-group">
+                <label htmlFor="Datum">Ponavljanje do: </label>
+                <input type="date" id="date_ponavljanje" name="date_ponavljanje" required />
+            </div>
             <div className="form-group toggle-group">
                 <label htmlFor="toggleInput" style={{marginLeft: '10px'}}>Ponavljanje</label>
                 <label className="switch">
