@@ -37,7 +37,7 @@ connection.connect();
 
 // Dohvati sve korisnike iz tablice "korisnici"
 app.get("/api/korisnici", authJwt.verifyTokenAdmin, (req, res) => {
-  connection.query("SELECT * FROM korisnici", (error, results) => {
+  connection.query("SELECT * FROM korisnici WHERE aktivan = '1'", (error, results) => {
     if (error) throw error;
 
     res.send(results);
@@ -50,7 +50,7 @@ app.post("/login", function (req, res) {
   const korisnickoIme = data.korisnicko_ime;
   const password = data.password;
 
-  connection.query("SELECT * FROM korisnici WHERE korisnicko_ime = ? AND lozinka = ?", [korisnickoIme, password], function (err, result) {
+  connection.query("SELECT * FROM korisnici WHERE korisnicko_ime = ? AND lozinka = ? AND aktivan = '1'", [korisnickoIme, password], function (err, result) {
     if (err) {
       res.status(500).json({ success: false, message: "Internal server error" });
     } else if (result.length > 0) {
@@ -76,11 +76,14 @@ app.get("/logout", (req, res) => {
 // Unos novog korisnika (tablica "korisnici")
 app.post('/unosKorisnika', authJwt.verifyTokenAdmin, function (request, response) {
   const data = request.body;
-  korisnik = [[data.id_korisnik, data.korisnicko_ime,  data.ime, data.prezime, data.lozinka, data.uloga]]
-  connection.query('INSERT INTO korisnci (id_korisnik, korisnicko_ime, ime, prezime, lozinka, uloga) VALUES ?',
+  const korisnik = [[data.id_korisnik, data.korisnicko_ime, data.ime, data.prezime, data.lozinka, data.uloga]];
+  connection.query('INSERT INTO korisnici (id_korisnik, korisnicko_ime, ime, prezime, lozinka, uloga) VALUES ?',
   [korisnik], function (error, results, fields) {
-    if (error) throw error;
-    console.log('data', data)
+    if (error) {
+      console.error('Insert error:', error);
+      return response.status(500).send({ error: true, message: 'Error adding user' });
+    }
+    console.log('Inserted data:', data);
     return response.send({ error: false, data: results, message: 'Korisnik je dodan.' });
   });
 });
@@ -88,8 +91,8 @@ app.post('/unosKorisnika', authJwt.verifyTokenAdmin, function (request, response
 // Unos novog studijskog programa (tablica "studijskiProgrami")
 app.post('/unosStudijskogPrograma', authJwt.verifyTokenAdmin, function (request, response) {
   const data = request.body;
-  studijskiprogram = [[data.id_StudijskogPrograma, data.naziv]]
-  connection.query('INSERT INTO studijskiProgrami (id_StudijskogPrograma, naziv) VALUES ?',
+  const studijskiprogram = [[data.id_StudijskogPrograma, data.naziv, data.aktivan]]
+  connection.query('INSERT INTO studijskiProgrami (id_StudijskogPrograma, naziv, aktivan) VALUES ?',
   [studijskiprogram], function (error, results, fields) {
     if (error) throw error;
     console.log('data', data)
@@ -100,20 +103,20 @@ app.post('/unosStudijskogPrograma', authJwt.verifyTokenAdmin, function (request,
 // Unos novog kolegija (tablica "kolegij")
 app.post('/unosKolegija', authJwt.verifyTokenAdmin, function (request, response) {
   const data = request.body;
-  novikolegij = [[data.id_kolegija, data.naziv,  data.id_korisnika, data.id_StudijskogPrograma]]
-  connection.query('INSERT INTO korisnci (id_kolegija, naziv) VALUES ?',
+  const novikolegij = [[data.id_kolegija, data.naziv,  data.id_korisnika, data.id_StudijskogPrograma, data.aktivan]]
+  connection.query('INSERT INTO kolegij (id_kolegija, naziv, id_korisnika, id_StudijskogPrograma, aktivan) VALUES ?',
   [novikolegij], function (error, results, fields) {
     if (error) throw error;
     console.log('data', data)
-    return response.send({ error: false, data: results, message: 'Korisnik je dodan.' });
+    return response.send({ error: false, data: results, message: 'Kolegij je dodan.' });
   });
 });
 
 // Unos nove dvorane (tablica "dvorane")
 app.post('/unosDvorane', authJwt.verifyTokenAdmin, function (request, response) {
   const data = request.body;
-  dvorana = [[data.id_dvorane, data.naziv,  data.opis, data.svrha]]
-  connection.query('INSERT INTO dvorane (id_dvorane, naziv, opis, svrha) VALUES ?',
+  const dvorana = [[data.id_dvorane, data.naziv,  data.opis, data.svrha, data.aktivan]]
+  connection.query('INSERT INTO dvorane (id_dvorane, naziv, opis, svrha, aktivan) VALUES ?',
   [dvorana], function (error, results, fields) {
     if (error) throw error;
     console.log('data', data)
@@ -126,7 +129,7 @@ app.get("/api/entry/:id", (req, res) => {
   const { id } = req.params;
 
   connection.query(
-      "SELECT id_entry, naziv, tip, opis, status, start_time, end_time, id_dvorane, id_korisnik, id_kolegij, id_studijskiProgrami",
+      "SELECT id_entry, naziv, tip, opis, status, start_time, end_time, id_dvorane, id_korisnik, id_kolegij, id_studijskiProgrami WHERE id_dvorane = ? AND status = 'aktivan'",
       [id],
       (error, results) => {
           if (error) throw error;
@@ -138,8 +141,8 @@ app.get("/api/entry/:id", (req, res) => {
 // Zahtjev rezervacija dvorana
 app.post('/api/zahtjevRezervacija', authJwt.verifyTokenAdminOrUser, function (request, response) {
   const data = request.body;
-  zahtjev = [[data.id_entry, data.naziv,  data.tip, data.opis, data.start_time, data.end_time, data.id_dvorane, data.id_korisnik, data.id_kolegij, data.id_studijskiProgrami]]
-  connection.query('INSERT INTO entry (id_entry, naziv, tip, opis, start_time, end_time, id_dvorane, id_korisnik, id_kolegij, id_studijskiProgrami) VALUES ?', [zahtjev], function (error, results, fields) {
+  const zahtjev = [[data.id_entry, data.naziv,  data.tip, data.opis, data.status, data.start_time, data.end_time, data.id_dvorane, data.id_korisnik, data.id_kolegij, data.id_studijskiProgrami]]
+  connection.query('INSERT INTO entry (id_entry, naziv, tip, opis, status, start_time, end_time, id_dvorane, id_korisnik, id_kolegij, id_studijskiProgrami) VALUES ?', [zahtjev], function (error, results, fields) {
     if (error) throw error;
     console.log('data', data)
     return response.send({ error: false, data: results, message: 'Korisnik je dodan.' });
@@ -179,6 +182,66 @@ app.get('/api/kolegiji', (req, res) => {
     if (error) throw error;
 
     res.send(results);
+  });
+});
+
+// Onemogući korisnika (tablica "korisnici")
+app.put('/onemoguciKorisnika', authJwt.verifyTokenAdmin, function (request, response) {
+  const data = request.body;
+  connection.query('UPDATE korisnici SET aktivan = "0" WHERE id_korisnik = ?', [data.id_korisnik], function (error, results, fields) {
+    if (error) throw error;
+    console.log('data', data)
+    return response.send({ error: false, data: results, message: 'Korisnik je onemogućen.' });
+  });
+});
+
+// Onemogući dvorana (tablica "dvorane")
+app.put('/onemoguciDvoranu', authJwt.verifyTokenAdmin, function (request, response) {
+  const data = request.body;
+  connection.query('UPDATE dvorane SET aktivan = "0" WHERE id_dvorane = ?', [data.id_dvorane], function (error, results, fields) {
+    if (error) throw error;
+    console.log('data', data)
+    return response.send({ error: false, data: results, message: 'Dvorana je onemogućena.' });
+  });
+});
+
+// Onemogući kolegija (tablica "kolegij")
+app.put('/onemoguciKolegij', authJwt.verifyTokenAdmin, function (request, response) {
+  const data = request.body;
+  connection.query('UPDATE kolegij SET aktivan = "0" WHERE id_kolegij = ?', [data.id_kolegij], function (error, results, fields) {
+    if (error) throw error;
+    console.log('data', data)
+    return response.send({ error: false, data: results, message: 'Kolegij je onemogućen.' });
+  });
+});
+
+// Onemogući studijskih programa (tablica "studijskiProgrami")
+app.put('/onemoguciStudijskiProgram', authJwt.verifyTokenAdmin, function (request, response) {
+  const data = request.body;
+  connection.query('UPDATE studijskiProgrami SET aktivan = "0" WHERE id_studijskiProgrami = ?', [data.id_studijskiProgrami], function (error, results, fields) {
+    if (error) throw error;
+    console.log('data', data)
+    return response.send({ error: false, data: results, message: 'Studijski program je onemogućen.' });
+  });
+});
+
+// Onemogući rezervacija (tablica "entry")
+app.put('/onemoguciRezervaciju', authJwt.verifyTokenAdmin, function (request, response) {
+  const data = request.body;
+  connection.query('UPDATE entry SET status = "0" WHERE id_entry = ?', [data.id_entry], function (error, results, fields) {
+    if (error) throw error;
+    console.log('data', data)
+    return response.send({ error: false, data: results, message: 'Rezervacija je onemogućena.' });
+  });
+});
+
+// Zatraživanje brisanje rezervacija (nastavnici) (tablica "entry")
+app.put('/zatrazivanjeBrisanjaRezervacija', authJwt.verifyTokenAdmin, function (request, response) {
+  const data = request.body;
+  connection.query('UPDATE entry SET status = "zatrazuje se brisanje" WHERE id_entry = ?', [data.id_entry], function (error, results, fields) {
+    if (error) throw error;
+    console.log('data', data)
+    return response.send({ error: false, data: results, message: 'Rezervacija je zatražuje se brisanje.' });
   });
 });
 
