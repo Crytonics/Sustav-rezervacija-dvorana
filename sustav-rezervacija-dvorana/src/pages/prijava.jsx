@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, NavLink, Outlet } from "react-router-dom";
 import ReCAPTCHA from "react-google-recaptcha";
 import { key } from "../../recaptcha_key";
+import axios from 'axios';
 
 export default function prijava() {
 
@@ -21,7 +22,39 @@ export default function prijava() {
             setShowMessage(true);
         } else {
             console.log("Otvaranje stranice")
+            spremi_podatke(e);
         }
+    }
+
+    const spremi_podatke = (e) => {
+        const korisnicko_ime = e.target.korisnicko_ime.value;
+        const password = e.target.password.value;
+
+        const userData = { korisnicko_ime, password };
+
+        // Here you can handle the data, e.g., send it to a server
+        console.log({userData});
+        // Example: postDataToServer({ ime, prezime, korisnicko_ime, password });
+        login(userData);
+    }
+
+    const login = async (userData) => {
+        try {
+            const response = await axios.post("http://localhost:3000/api/login", userData);
+            if (response.data.success) {
+                // Save the JWT token to local storage
+                localStorage.setItem("token", response.data.token);
+      
+                // Redirect to the desired page
+                window.location.href = "/Pocetna";
+              } else {
+                // Show error message if login fails
+                alert(response.data.message);
+              }
+        } catch (error) {
+            console.error("Login failed:", error);
+            alert("Prijava nije uspjela. Provjerite podatke i pokušajte ponovno.");
+          }
     }
 
     return (
