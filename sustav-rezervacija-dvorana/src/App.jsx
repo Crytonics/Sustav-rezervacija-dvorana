@@ -55,7 +55,7 @@ function App() {
 
           <Route path="listaKorisnikaAdministrator" element={<ListaKorisnikaAdministrator />} />
           <Route path="unosKorisnikaAdministrator" element={<UnosKorisnikaAdministrator />} />
-          <Route path="azuriranjeKorisnikaAdministrator" element={<AzuriranjeKorisnikaAdministrator />} />
+          <Route path="/AzuriranjeKorisnikaAdministrator/:idKorisnika" element={<AzuriranjeKorisnikaAdministrator />} />
           <Route path="pregledRezervacijaDvoranaAdministrator" element={<PregledRezervacijaDvoranaAdministrator />} />
           <Route path="unosRezervacijaDvoranaAdministrator" element={<UnosRezervacijaDvoranaAdministrator />} />
           <Route path="azuriranjeRezervacijaDvoranaAdministrator" element={<AzuriranjeRezervacijaDvoranaAdministrator />} />
