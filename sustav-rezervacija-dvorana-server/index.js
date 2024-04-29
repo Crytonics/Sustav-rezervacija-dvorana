@@ -44,19 +44,39 @@ app.get("/api/korisnici", authJwt.verifyTokenAdmin, (req, res) => {
   });
 });
 
+// Dohvati korisnika po id-u (tablica "korisnici")
+app.get('/api/pojed_korisnici/:idKorisnika', authJwt.verifyTokenAdmin, function (request, response) {
+  const idKorisnika = request.params.idKorisnika;
+  connection.query("SELECT * FROM korisnici WHERE aktivan = '1' AND id_korisnik = ?", [idKorisnika], function (error, results, fields) {
+    if (error) throw error;
+    
+    response.send(results);
+  });
+});
+
 // login
-app.post("/login", function (req, res) {
+app.post("/api/login", function (req, res) {
   const data = req.body;
   const korisnickoIme = data.korisnicko_ime;
   const password = data.password;
 
-  connection.query("SELECT * FROM korisnici WHERE korisnicko_ime = ? AND lozinka = ? AND aktivan = '1'", [korisnickoIme, password], function (err, result) {
+  connection.query("SELECT * FROM korisnici WHERE korisnicko_ime = ? AND aktivan = '1'", [korisnickoIme], function (err, result) {
     if (err) {
       res.status(500).json({ success: false, message: "Internal server error" });
     } else if (result.length > 0) {
-      res.status(200).json({ success: true, message: "Prijava uspješna!" });
+      // Compare passwords
+      bcrypt.compare(password, result[0].lozinka, function (err, bcryptRes) {
+        if (bcryptRes) {
+          // Generate JWT token
+          const token = jwt.sign({ id: result[0].id_korisnik, korisnicko_ime: result[0].korisnicko_ime, uloga: result[0].uloga }, config.secret);
+          res.status(200).json({ success: true, message: "Login successful", token: token });
+          console.log("Token: ", token);
+        } else {
+          res.status(401).json({ success: false, message: "Invalid korisnicko ime or password " });
+        }
+      });
     } else {
-      res.status(401).json({ success: false, message: "Krivo korisničko ime ili lozinka!" });
+      res.status(401).json({ success: false, message: "Invalid korisnicko ime or password" });
     }
   });
 });
@@ -74,17 +94,25 @@ app.get("/logout", (req, res) => {
 });
 
 // Unos novog korisnika (tablica "korisnici")
-app.post('/unosKorisnika', authJwt.verifyTokenAdmin, function (request, response) {
+app.post('/api/unosKorisnika', authJwt.verifyTokenAdmin, function (request, response) {
   const data = request.body;
-  const korisnik = [[data.id_korisnik, data.korisnicko_ime, data.ime, data.prezime, data.lozinka, data.uloga]];
-  connection.query('INSERT INTO korisnici (id_korisnik, korisnicko_ime, ime, prezime, lozinka, uloga) VALUES ?',
-  [korisnik], function (error, results, fields) {
-    if (error) {
-      console.error('Insert error:', error);
-      return response.status(500).send({ error: true, message: 'Error adding user' });
+  const saltRounds = 10;
+
+  bcrypt.hash(data.password, saltRounds, function (err, hash) {
+    if (err) {
+      console.error("Error hashing password:", err);
+      return response.status(500).json({ error: true, message: "Error hashing password." });
     }
-    console.log('Inserted data:', data);
-    return response.send({ error: false, data: results, message: 'Korisnik je dodan.' });
+
+    const korisnik = [[data.id_korisnik, data.korisnicko_ime, data.ime, data.prezime, hash, data.uloga, "1"]];
+    connection.query('INSERT INTO korisnici (id_korisnik, korisnicko_ime, ime, prezime, lozinka, uloga, aktivan) VALUES ?', [korisnik], function (error, results, fields) {
+      if (error) {
+        console.error('Insert error:', error);
+        return response.status(500).send({ error: true, message: 'Error adding user' });
+      }
+      console.log('Inserted data:', data);
+      return response.send({ error: false, data: results, message: 'Korisnik je dodan.' });
+    });
   });
 });
 
@@ -186,14 +214,14 @@ app.get('/api/kolegiji', (req, res) => {
 });
 
 // Onemogući korisnika (tablica "korisnici")
-app.put('/onemoguciKorisnika', authJwt.verifyTokenAdmin, function (request, response) {
-  const data = request.body;
-  connection.query('UPDATE korisnici SET aktivan = "0" WHERE id_korisnik = ?', [data.id_korisnik], function (error, results, fields) {
+app.put('/api/onemoguciKorisnika/:idKorisnika', authJwt.verifyTokenAdmin, function (request, response) {
+  const idKorisnika = request.params.idKorisnika;
+  connection.query('UPDATE korisnici SET aktivan = "0" WHERE id_korisnik = ?', [idKorisnika], function (error, results, fields) {
     if (error) throw error;
-    console.log('data', data)
-    return response.send({ error: false, data: results, message: 'Korisnik je onemogućen.' });
+    return response.send({ error: false, data: results, message: 'Korisnik je obrisan.' });
   });
 });
+
 
 // Onemogući dvorana (tablica "dvorane")
 app.put('/onemoguciDvoranu', authJwt.verifyTokenAdmin, function (request, response) {
@@ -242,6 +270,30 @@ app.put('/zatrazivanjeBrisanjaRezervacija', authJwt.verifyTokenAdmin, function (
     if (error) throw error;
     console.log('data', data)
     return response.send({ error: false, data: results, message: 'Rezervacija je zatražuje se brisanje.' });
+  });
+});
+
+// Ažuriranje korisnika (tablica "korisnici")
+app.put('/api/azuriranjeKorisnika/:idKorisnika', authJwt.verifyTokenAdmin, function (request, response) {
+  const idKorisnika = request.params.idKorisnika;
+  const saltRounds = 10;
+  const data = request.body;
+
+  bcrypt.hash(data.password, saltRounds, function (err, hash) {
+    if (err) {
+      console.error("Error hashing password:", err);
+      return response.status(500).json({ error: true, message: "Error hashing password." });
+    }
+
+    const korisnik = [[data.korisnicko_ime, data.ime, data.prezime, hash, data.uloga, "1"]];
+    connection.query('UPDATE korisnici SET korisnicko_ime = ?, ime = ?, prezime = ?, lozinka = ?, uloga = ?, aktivan = ? WHERE id_korisnik = ?', [data.korisnicko_ime, data.ime, data.prezime, hash, data.uloga, "1", idKorisnika], function (error, results, fields) {
+      if (error) {
+        console.error('Insert error:', error);
+        return response.status(500).send({ error: true, message: 'Error adding user' });
+      }
+      console.log('Inserted data:', data);
+      return response.send({ error: false, data: results, message: 'Korisnik je dodan.' });
+    });
   });
 });
 
