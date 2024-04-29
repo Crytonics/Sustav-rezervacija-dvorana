@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, NavLink, Outlet } from "react-router-dom";
 
 export default function MainLayout() {
@@ -10,6 +10,44 @@ export default function MainLayout() {
         setIsDrawerOpen(!isDrawerOpen);
     };
 
+    const potvrdiOdjavu = () => {
+      // Clear JWT token from local storage
+      localStorage.removeItem("token");
+      // Reload the page
+      window.location.reload();
+    }
+
+    const isAdmin = () => {
+        if (isAuthenticated() && token.value) {
+          return decodeToken(token.value) === "admin";
+        }
+        return false;
+    };
+
+    const isAuthenticated = () => {
+        const token = localStorage.getItem("token");
+        return !!token;
+    };
+
+    useEffect(() => {
+        async function fetchInitialData() {
+            // Get the JWT token from local storage
+            const token = localStorage.getItem("token");
+
+            const decodeToken = (token) => {
+                try {
+                  const decoded = jwtDecode(token);
+                  return decoded.uloga;
+                } catch (error) {
+                  console.error("Error decoding token:", error);
+                  return null;
+                }
+            };
+        }
+
+        fetchInitialData();
+    }, []);
+
     return (
         <div className="main-layout">
             <header>
@@ -19,7 +57,8 @@ export default function MainLayout() {
                             {isDrawerOpen ? 'Close' : 'Menu'}
                         </button>
                         <NavLink to="Pocetna" className="Pocetna">Sustav rezervacija dvorana</NavLink>
-                        <NavLink to="Prijava" className="gumb">Prijava</NavLink>
+                        {isAuthenticated() && <NavLink className='gumb' onClick={potvrdiOdjavu}>Odjava</NavLink>}
+                        {!isAuthenticated() && <NavLink to="Prijava" className="gumb">Prijava</NavLink>}
                     </div>
                     {/* Button to toggle drawer */}
                     {/* Conditionally render the drawer based on isDrawerOpen state */}
