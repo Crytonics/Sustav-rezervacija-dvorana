@@ -117,27 +117,30 @@ app.post('/api/unosKorisnika', authJwt.verifyTokenAdmin, function (request, resp
 });
 
 // Unos novog studijskog programa (tablica "studijskiProgrami")
-app.post('/unosStudijskogPrograma', authJwt.verifyTokenAdmin, function (request, response) {
+app.post('/api/unosStudijskogPrograma', authJwt.verifyTokenAdmin, function (request, response) {
   const data = request.body;
-  const studijskiprogram = [[data.id_StudijskogPrograma, data.naziv, data.aktivan]]
+  const studijskiprogram = [[data.id_StudijskogPrograma, data.naziv_studija, "1"]]
   connection.query('INSERT INTO studijskiProgrami (id_StudijskogPrograma, naziv, aktivan) VALUES ?',
   [studijskiprogram], function (error, results, fields) {
     if (error) throw error;
-    console.log('data', data)
-    return response.send({ error: false, data: results, message: 'Korisnik je dodan.' });
+    return response.send({ error: false, data: results, message: 'Studijski program je dodan.' });
   });
 });
 
 // Unos novog kolegija (tablica "kolegij")
-app.post('/unosKolegija', authJwt.verifyTokenAdmin, function (request, response) {
+app.post('/api/unosKolegija', authJwt.verifyTokenAdmin, function (request, response) {
   const data = request.body;
-  const novikolegij = [[data.id_kolegija, data.naziv,  data.id_korisnika, data.id_StudijskogPrograma, data.aktivan]]
-  connection.query('INSERT INTO kolegij (id_kolegija, naziv, id_korisnika, id_StudijskogPrograma, aktivan) VALUES ?',
-  [novikolegij], function (error, results, fields) {
-    if (error) throw error;
-    console.log('data', data)
-    return response.send({ error: false, data: results, message: 'Kolegij je dodan.' });
-  });
+  const novikolegij = [[data.id_kolegija, data.naziv_kolegija,  data.nastavnik, data.studijski_program, "1"]]
+
+    connection.query('INSERT INTO kolegij (id_kolegija, naziv, id_korisnik, id_studijskogPrograma, aktivan) VALUES ?', [novikolegij], function (error, results, fields) {
+      if (error) {
+        console.error('Insert error:', error);
+        return response.status(500).send({ error: true, message: 'Error adding kolegij' });
+      }
+      console.log('Inserted data:', data);
+      return response.send({ error: false, data: results, message: 'Kolegij je dodan.' });
+    }
+  );
 });
 
 // Unos nove dvorane (tablica "dvorane")
@@ -195,6 +198,25 @@ app.get('/api/korisnici', authJwt.verifyTokenAdmin, (req, res) => {
   });
 });
 
+// Pregled/Dohvati studijske programe (tablica "studijskiProgrami")
+app.get('/api/studijskiProgrami', (req, res) => {
+  connection.query("SELECT * FROM studijskiProgrami WHERE aktivan = '1'", (error, results) => {
+    if (error) throw error;
+
+    res.send(results);
+  });
+});
+
+// Pregled/Dohvati studijske programe po id-u (tablica "studijskiProgrami")
+app.get('/api/pojed_studijskiProgrami/:idStudProg', authJwt.verifyTokenAdmin, function (request, response) {
+  const idStudProg = request.params.idStudProg;
+  connection.query("SELECT * FROM studijskiProgrami WHERE aktivan = '1' AND id_studijskogPrograma = ?", [idStudProg], function (error, results) {
+    if (error) throw error;
+
+    response.send(results);
+  });
+});
+
 // Pregled/Dohvati dvorane (tablica "dvorane")
 app.get('/api/dvorane', (req, res) => {
   connection.query("SELECT * FROM dvorane", (error, results) => {
@@ -206,10 +228,46 @@ app.get('/api/dvorane', (req, res) => {
 
 // Pregled/Dohvati kolegiji (tablica "kolegij")
 app.get('/api/kolegiji', (req, res) => {
-  connection.query("SELECT * FROM kolegij", (error, results) => {
-    if (error) throw error;
+  const query = `
+    SELECT 
+      k.id_kolegija, 
+      k.naziv AS naziv_kolegija, 
+      CONCAT(kor.ime, ' ', kor.prezime, ' (', kor.korisnicko_ime, ')') AS korisnicko_ime, 
+      sp.naziv AS naziv_studijskog_programa
+    FROM kolegij k
+    INNER JOIN korisnici kor ON k.id_korisnik = kor.id_korisnik
+    INNER JOIN studijskiProgrami sp ON k.id_studijskogPrograma = sp.id_studijskogPrograma
+    WHERE k.aktivan = '1' AND kor.aktivan = '1' AND sp.aktivan = '1';
+  `;
 
+  connection.query(query, (error, results) => {
+    if (error) {
+      console.error("Error fetching data:", error);
+      return res.status(500).json({ error: true, message: "Error fetching data from database." });
+    }
     res.send(results);
+  });
+});
+
+// Pregled/Dohvati kolegij po id-u (tablica "kolegij")
+app.get('/api/pojed_kolegiji/:idKolegija', authJwt.verifyTokenAdmin, function (request, response) {
+  const idStudProg = request.params.idKolegija;
+  connection.query(`
+      SELECT 
+        k.id_kolegija, 
+        k.naziv AS naziv_kolegija, 
+        CONCAT(kor.ime, ' ', kor.prezime) AS korisnicko_ime, 
+        sp.naziv AS naziv_studijskog_programa
+      FROM kolegij k
+      INNER JOIN korisnici kor ON k.id_korisnik = kor.id_korisnik
+      INNER JOIN studijskiProgrami sp ON k.id_studijskogPrograma = sp.id_studijskogPrograma
+      WHERE k.aktivan = '1' AND kor.aktivan = '1' AND sp.aktivan = '1' AND k.id_kolegija = ?;
+    `, [idStudProg], function (error, results) {
+    if (error) {
+      console.error("Error fetching data:", error);
+      return response.status(500).json({ error: true, message: "Error fetching data from database." });
+    }
+    response.send(results);
   });
 });
 
@@ -234,24 +292,24 @@ app.put('/onemoguciDvoranu', authJwt.verifyTokenAdmin, function (request, respon
 });
 
 // Onemogući kolegija (tablica "kolegij")
-app.put('/onemoguciKolegij', authJwt.verifyTokenAdmin, function (request, response) {
-  const data = request.body;
-  connection.query('UPDATE kolegij SET aktivan = "0" WHERE id_kolegij = ?', [data.id_kolegij], function (error, results, fields) {
+app.put('/api/onemoguciKolegij/:idKolegija', authJwt.verifyTokenAdmin, function (request, response) {
+  const idKolegija = request.params.idKolegija;
+  connection.query('UPDATE kolegij SET aktivan = "0" WHERE id_kolegija = ?', [idKolegija], function (error, results, fields) {
     if (error) throw error;
-    console.log('data', data)
     return response.send({ error: false, data: results, message: 'Kolegij je onemogućen.' });
   });
 });
 
 // Onemogući studijskih programa (tablica "studijskiProgrami")
-app.put('/onemoguciStudijskiProgram', authJwt.verifyTokenAdmin, function (request, response) {
+app.put('/api/onemoguciStudijskiProgram/:idStudProg', authJwt.verifyTokenAdmin, function (request, response) {
   const data = request.body;
-  connection.query('UPDATE studijskiProgrami SET aktivan = "0" WHERE id_studijskiProgrami = ?', [data.id_studijskiProgrami], function (error, results, fields) {
+  const idStudProg = request.params.idStudProg;
+  connection.query('UPDATE studijskiProgrami SET aktivan = "0" WHERE id_studijskogPrograma = ?', [idStudProg], function (error, results, fields) {
     if (error) throw error;
-    console.log('data', data)
     return response.send({ error: false, data: results, message: 'Studijski program je onemogućen.' });
   });
 });
+
 
 // Onemogući rezervacija (tablica "entry")
 app.put('/onemoguciRezervaciju', authJwt.verifyTokenAdmin, function (request, response) {
@@ -295,6 +353,50 @@ app.put('/api/azuriranjeKorisnika/:idKorisnika', authJwt.verifyTokenAdmin, funct
       return response.send({ error: false, data: results, message: 'Korisnik je dodan.' });
     });
   });
+});
+
+// Ažuriranje studijskih programa (tablica "studijskiProgrami")
+app.put('/api/azuriranjeStudijskihPrograma/:idStudProg', authJwt.verifyTokenAdmin, function (request, response) {
+  const idStudProg = request.params.idStudProg;
+  const data = request.body;
+    connection.query('UPDATE studijskiProgrami SET naziv = ?, aktivan = ? WHERE id_studijskogPrograma = ?', [data.naziv, "1", idStudProg], function (error, results, fields) {
+      if (error) {
+        console.error('Insert error:', error);
+        return response.status(500).send({ error: true, message: 'Error adding studijski program' });
+      }
+      console.log('Inserted data:', data);
+      return response.send({ error: false, data: results, message: 'Studijski program je dodan.' });
+  });
+});
+
+// Ažuriranje kolegija po id-u (tablica "kolegij")
+app.put('/api/pojed_kolegiji/:idKolegija', authJwt.verifyTokenAdmin, function (request, response) {
+  const idKolegija = request.params.idKolegija;
+  const data = request.body;
+    connection.query('UPDATE kolegij SET naziv = ?, id_korisnik = ?, id_studijskogPrograma = ? WHERE id_kolegija = ?', [data.naziv_kolegija, data.nastavnik, data.studijski_program, idKolegija], function (error, results, fields) {
+      if (error) {
+        console.error('Insert error:', error);
+        return response.status(500).send({ error: true, message: 'Error adding studijski program' });
+      }
+      console.log('Inserted data:', data);
+      return response.send({ error: false, data: results, message: 'Studijski program je dodan.' });
+  });
+});
+
+// Unos novog kolegija (tablica "kolegij")
+app.post('/api/unosKolegija', authJwt.verifyTokenAdmin, function (request, response) {
+  const data = request.body;
+  const novikolegij = [[data.id_kolegija, data.naziv_kolegija,  data.nastavnik, data.studijski_program, "1"]]
+
+    connection.query('INSERT INTO kolegij (id_kolegija, naziv, id_korisnik, id_studijskogPrograma, aktivan) VALUES ?', [novikolegij], function (error, results, fields) {
+      if (error) {
+        console.error('Insert error:', error);
+        return response.status(500).send({ error: true, message: 'Error adding kolegij' });
+      }
+      console.log('Inserted data:', data);
+      return response.send({ error: false, data: results, message: 'Kolegij je dodan.' });
+    }
+  );
 });
 
 app.listen(port, () => {
