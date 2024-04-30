@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, Outlet } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 export default function MainLayout() {
     // State to manage drawer visibility
@@ -18,8 +19,37 @@ export default function MainLayout() {
     }
 
     const isAdmin = () => {
-        if (isAuthenticated() && token.value) {
-          return decodeToken(token.value) === "admin";
+        const token = localStorage.getItem("token");
+        if (isAuthenticated() && token) {
+            const decodeToken = (token) => {
+                try {
+                    const decoded = jwtDecode(token);
+                    return decoded.uloga;
+                } catch (error) {
+                    console.error("Error decoding token:", error);
+                    return null;
+                }
+            };
+    
+            return decodeToken(token) === "admin";
+        }
+        return false;
+    };
+
+    const isNastavnik = () => {
+        const token = localStorage.getItem("token");
+        if (isAuthenticated() && token) {
+            const decodeToken = (token) => {
+                try {
+                    const decoded = jwtDecode(token);
+                    return decoded.uloga;
+                } catch (error) {
+                    console.error("Error decoding token:", error);
+                    return null;
+                }
+            };
+    
+            return decodeToken(token) === "nastavnik";
         }
         return false;
     };
@@ -28,25 +58,6 @@ export default function MainLayout() {
         const token = localStorage.getItem("token");
         return !!token;
     };
-
-    useEffect(() => {
-        async function fetchInitialData() {
-            // Get the JWT token from local storage
-            const token = localStorage.getItem("token");
-
-            const decodeToken = (token) => {
-                try {
-                  const decoded = jwtDecode(token);
-                  return decoded.uloga;
-                } catch (error) {
-                  console.error("Error decoding token:", error);
-                  return null;
-                }
-            };
-        }
-
-        fetchInitialData();
-    }, []);
 
     return (
         <div className="main-layout">
@@ -69,17 +80,17 @@ export default function MainLayout() {
                         <li><NavLink to="studijskiProgramiSvi" className="link">Studijski Programi</NavLink></li>
                         <br />
                         {/* Nastavnici */}
-                        <li><NavLink to="zatraziRezervacijuNastavnici" className="link">Zahtjev za Rezervaciju</NavLink></li>
-                        <li><NavLink to="pregledSvojihRezervacijaNastavnici" className="link">Pregled Rezervacija</NavLink></li>
-                        <li><NavLink to="pregledSvojihKolegijaNastavnici" className="link">Pregled Kolegija</NavLink></li>
-                        <br />
+                        {(isNastavnik() || isAdmin()) && <li><NavLink to="zatraziRezervacijuNastavnici" className="link">Zahtjev za Rezervaciju</NavLink></li>}
+                        {(isNastavnik() || isAdmin()) && <li><NavLink to="pregledSvojihRezervacijaNastavnici" className="link">Pregled Rezervacija</NavLink></li>}
+                        {(isNastavnik() || isAdmin()) && <li><NavLink to="pregledSvojihKolegijaNastavnici" className="link">Pregled Kolegija</NavLink></li>}
+                        {(isNastavnik() || isAdmin()) && <br />}
                         {/* Administrator */}
-                        <li><NavLink to="listaKorisnikaAdministrator" className="link">Lista Korisnika</NavLink></li>
-                        <li><NavLink to="pregledRezervacijaDvoranaAdministrator" className="link">Pregled Rezervacija Dvorana</NavLink></li>
-                        <li><NavLink to="dvoraneAdministrator" className="link">Dvorane</NavLink></li>
-                        <li><NavLink to="kolegijiAdministrator" className="link">Kolegiji</NavLink></li>
-                        <li><NavLink to="studijskiProgramiAdministrator" className="link">Studijski Programi</NavLink></li>
-                        <li><NavLink to="odobravanjeTerminaDvoranaAdministrator" className="link">Odobravanje Termina Dvorana</NavLink></li>
+                        {isAdmin() && <li><NavLink to="listaKorisnikaAdministrator" className="link">Lista Korisnika</NavLink></li>}
+                        {isAdmin() && <li><NavLink to="pregledRezervacijaDvoranaAdministrator" className="link">Pregled Rezervacija Dvorana</NavLink></li>}
+                        {isAdmin() && <li><NavLink to="dvoraneAdministrator" className="link">Dvorane</NavLink></li>}
+                        {isAdmin() && <li><NavLink to="kolegijiAdministrator" className="link">Kolegiji</NavLink></li>}
+                        {isAdmin() && <li><NavLink to="studijskiProgramiAdministrator" className="link">Studijski Programi</NavLink></li>}
+                        {isAdmin() && <li><NavLink to="odobravanjeTerminaDvoranaAdministrator" className="link">Odobravanje Termina Dvorana</NavLink></li>}
                         </div>
                 </nav>
             </header>
