@@ -1,24 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 export default function KolegijiAdministrator() {
 
     const [searchTerm, setSearchTerm] = useState('');
 
-    const [programs, setPrograms] = useState([
-        { id: 1, naziv: 'Programiranje', izvodjac: 'Primjer Izvođača', studij: 'Informatika'},
-        { id: 2, naziv: 'Elementi telematike', izvodjac: 'Primjer Izvođača 2', studij: 'Telematika'},
-        { id: 3, naziv: 'Baze podataka', izvodjac: 'Primjer Izvođača 3', studij: 'Promet'},
+    const [kolegiji, setKolegiji] = useState([]);
+
+    const [stupci, setStupci] = useState([
+        {
+            name: "naziv",
+            required: true,
+            label: "Naziv",
+            align: "left",
+            field: "naziv",
+            sortable: true,
+        },
+        {
+            name: "izvodjac_kolegija",
+            required: true,
+            label: "Izvođač kolegija",
+            align: "left",
+            field: "izvodjac_kolegija",
+            sortable: true,
+        },
+        {
+            name: "studijski_program",
+            required: true,
+            label: "Studijski program",
+            align: "left",
+            field: "studijski_program",
+            sortable: true,
+        },
+        {
+            name: "funkcije",
+            label: "Funkcije",
+            align: "center",
+        }
     ]);
 
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value);
     };
 
-    const filteredPrograms = programs.filter(program =>
-        program.naziv.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        program.izvodjac.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        program.studij.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredKolegiji = kolegiji.filter(kolegij =>
+        kolegij.naziv_kolegija.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        kolegij.korisnicko_ime.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        kolegij.naziv_studijskog_programa.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const filteredStupci = stupci.filter(stupc =>
+        stupc.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const navigate = useNavigate();
@@ -27,12 +60,46 @@ export default function KolegijiAdministrator() {
         navigate("/unosKolegijaAdministrator");
     }
 
-    const vidi_stisnuto = () => {
-        navigate("/pojediniKolegijiSvi");
+    const vidi_stisnuto = (idKolegija) => {
+        navigate(`/pojediniKolegijiSvi/${idKolegija}`);
     }
     
-    const uredi_stisnuto = () => {
-        navigate("/azuriranjeKolegijaAdministrator");
+    const uredi_stisnuto = (idKolegija) => {
+        navigate(`/azuriranjeKolegijaAdministrator/${idKolegija}`);
+    }
+
+    useEffect(() => {
+        async function fetchInitialData() {
+            // Get the JWT token from local storage
+            const token = localStorage.getItem("token");
+        
+            // Set up the request headers to include the JWT token
+            const headers = { Authorization: `Bearer ${token}` };
+
+            dohvatiKolegija(headers);
+        }
+
+        fetchInitialData();
+    }, []);
+
+    const dohvatiKolegija = async (headers) => {
+        try {
+            const response = await axios.get("http://localhost:3000/api/kolegiji", {headers});
+            setKolegiji(response.data);
+            console.log("DATA:", response.data);
+        } catch (error) {
+            console.log("Greška prilikom dohvata korisnika:", error);
+        } 
+    }
+
+    const obrisiKorisnika = async (idKolegija) => {
+        const token = localStorage.getItem("token");
+        const headers = { Authorization: `Bearer ${token}` };
+        if(window.confirm('Jeste li sigurni da želite obrisati korisnika?')) {
+            const response = await axios.put("http://localhost:3000/api/onemoguciKolegij/" + idKolegija, null, {headers}); //null zbog PUT 'payloada'
+            const response2 = await axios.get("http://localhost:3000/api/kolegiji", {headers});
+            setKolegiji(response2.data);
+        }
     }
 
     return (
@@ -56,22 +123,23 @@ export default function KolegijiAdministrator() {
             <table>
                 <thead>
                     <tr>
-                        <th>Naziv</th>
-                        <th>Izvođač kolegija</th>
-                        <th>Studijski program</th>
-                        <th>Funkcije</th>
+                    {filteredStupci.length > 0 && 
+                        filteredStupci.map(stupc => (
+                            <th key={stupc.label}>{stupc.label}</th>
+                        ))}
                     </tr>
                 </thead>
                 <tbody>
-                {filteredPrograms.map((program) => (
-                        <tr key={program.id}>
-                            <td>{program.naziv}</td>
-                            <td>{program.izvodjac}</td>
-                            <td>{program.studij}</td>
+                    {filteredKolegiji.map((kolegij, index) => (
+                        <tr key={index}>
+                            <td>{kolegij.naziv_kolegija }</td>
+                            <td>{kolegij.korisnicko_ime }</td>
+                            <td>{kolegij.naziv_studijskog_programa}</td>
+                            
                             <td>
-                                <button className="gumb_vidi" onClick={vidi_stisnuto}>Vidi</button>
-                                <button className="gumb_uredi" onClick={uredi_stisnuto}>Uredi</button>
-                                <button className="gumb_obriši">Izbriši</button>
+                            <button className="gumb_vidi" onClick={() => vidi_stisnuto(kolegij.id_kolegija)}>Vidi</button>
+                                <button className="gumb_uredi" onClick={() => uredi_stisnuto(kolegij.id_kolegija)}>Uredi</button>
+                                <button className="gumb_obriši" onClick={() => obrisiKorisnika(kolegij.id_kolegija)}>Izbriši</button>
                             </td>
                         </tr>
                     ))}
