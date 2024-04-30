@@ -43,7 +43,9 @@ function App() {
           <Route path="prijava" element={<Prijava />} />
           <Route path="pojedineDvoraneSvi" element={<PojedineDvoraneSvi />} />
           <Route path="pojediniKolegijiSvi" element={<PojediniKolegijiSvi />} />
+          <Route path="/PojediniKolegijiSvi/:idKolegija" element={<PojediniKolegijiSvi />} />
           <Route path="pojediniKolegijiPoStudijimaSvi" element={<PojediniKolegijiPoStudijimaSvi />} />
+          <Route path="/PojediniKolegijiPoStudijimaSvi/:idStudProg" element={<PojediniKolegijiPoStudijimaSvi />} />
           <Route path="dvoraneSvi" element={<DvoraneSvi />} />
           <Route path="kolegijiSvi" element={<KolegijiSvi />} />
           <Route path="studijskiProgramiSvi" element={<StudijskiProgramiSvi />} />
@@ -63,9 +65,10 @@ function App() {
           <Route path="kolegijiAdministrator" element={<KolegijiAdministrator />} />
           <Route path="unosKolegijaAdministrator" element={<UnosKolegijaAdministrator />} />
           <Route path="azuriranjeKolegijaAdministrator" element={<AzuriranjeKolegijaAdministrator />} />
+          <Route path="/AzuriranjeKolegijaAdministrator/:idKolegija" element={<AzuriranjeKolegijaAdministrator />} />
           <Route path="studijskiProgramiAdministrator" element={<StudijskiProgramiAdministrator />} />
           <Route path="unosStudijskihProgramaAdministrator" element={<UnosStudijskihProgramaAdministrator />} />
-          <Route path="azuriranjeStudijskihProgramaAdministrator" element={<AzuriranjeStudijskihProgramaAdministrator />} />
+          <Route path="/AzuriranjeStudijskihProgramaAdministrator/:idStudProg" element={<AzuriranjeStudijskihProgramaAdministrator />} />
           <Route path="odobravanjeTerminaDvoranaAdministrator" element={<OdobravanjeTerminaDvoranaAdministrator />} />
           <Route path="unosDvoranaAdministrator" element={<UnosDvoranaAdministrator />} />
           <Route path="azuriranjeDvoranaAdministrator" element={<AzuriranjeDvoranaAdministrator />} />
