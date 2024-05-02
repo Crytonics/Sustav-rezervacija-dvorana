@@ -1,11 +1,11 @@
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 
-export default function ZatraziRezervacijuNastavnici() {
+export default function AzuriranjeSvojihRezervacija() {
 
     const navigate = useNavigate();
 
     const natrak_stisnuto = () => {
-        navigate("/pocetna");
+        navigate("/pregledRezervacijaDvoranaAdministrator");
     }
 
     function generateTimeOptions() {
@@ -26,7 +26,7 @@ export default function ZatraziRezervacijuNastavnici() {
                 <label htmlFor="Nastavnik">Kolegij: </label>
                 <select id="Kolegij" name="Kolegij" required>
                     <option value="">Odaberite kolegij</option>
-                    <option value="Kolegij1">Informatika</option>
+                    <option value="Kolegij1" selected>Informatika</option>
                     <option value="Kolegij2">Telematika</option>
                     <option value="Kolegij3">Promet</option>
                 </select>
@@ -35,7 +35,7 @@ export default function ZatraziRezervacijuNastavnici() {
                 <label htmlFor="Dvorana">Dvorana: </label>
                 <select id="Dvorana" name="Dvorana" required>
                     <option value="">Odaberite kolegij</option>
-                    <option value="Dvorana1">Dvorana 1</option>
+                    <option value="Dvorana1" selected>Dvorana 1</option>
                     <option value="Dvorana2">Dvorana 2</option>
                     <option value="Dvorana3">Dvorana 3</option>
                 </select>
@@ -44,7 +44,7 @@ export default function ZatraziRezervacijuNastavnici() {
                 <label htmlFor="Razlog">Razlog: </label>
                 <select id="Razlog" name="Razlog" required>
                     <option value="">Odaberite kolegij</option>
-                    <option value="Razlog1">Predavanja</option>
+                    <option value="Razlog1" selected>Predavanja</option>
                     <option value="Razlog2">Ispit</option>
                 </select>
             </div>
@@ -65,10 +65,6 @@ export default function ZatraziRezervacijuNastavnici() {
                     <option value="">Odaberite kraj</option>
                     {generateTimeOptions()}
                 </select>
-            </div>
-            <div className="form-group">
-                <label htmlFor="Datum">Ponavljanje do: </label>
-                <input type="date" id="date_ponavljanje" name="date_ponavljanje" required />
             </div>
             <div className="form-group toggle-group">
                 <label htmlFor="toggleInput" style={{marginLeft: '10px'}}>Ponavljanje</label>
