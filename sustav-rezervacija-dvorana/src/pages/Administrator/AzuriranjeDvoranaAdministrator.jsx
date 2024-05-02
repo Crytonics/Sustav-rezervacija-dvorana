@@ -14,14 +14,14 @@ export default function AzuriranjeDvorane() {
         navigate("/dvoraneAdministrator");
     }
 
-    const { idDvorane } = useParams()
+    const { id_dvorane } = useParams()
 
     const filteredDvorane = dvorane.filter(dvorane =>
         dvorane.naziv.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        dvorane.opis.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        dvorane.svrha.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        dvorane.aktivan.toLowerCase().includes(searchTerm.toLowerCase())
+        dvorane.svrha.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+
 
 
     useEffect(() => {
@@ -30,11 +30,12 @@ export default function AzuriranjeDvorane() {
             const headers = { Authorization: `Bearer ${token}` }; 
 
             try {
-                const response = await axios.get(`http://localhost:3000/api/dvorane/${idDvorane}`, { headers });
+                const response = await axios.get(`http://localhost:3000/api/pojed_dvorane/${id_dvorane}`, { headers });
                 setDvorane(response.data);
             } catch (error) {
                 console.log("Greška prilikom dohvata podataka:", error);
-            } 
+            }
+            console.log(id_dvorane);
         }
 
         fetchInitialData();
@@ -43,11 +44,9 @@ export default function AzuriranjeDvorane() {
     const spremi_podatke = (event) => {
         event.preventDefault();
         const naziv = event.target.naziv.value;
-        const opis = event.target.opis.value;
         const svrha = event.target.svrha.value;
-        const aktivan = event.target.aktivan.checked;
 
-        const userData = { naziv, opis, svrha, aktivan };
+        const userData = { naziv, svrha };
 
         posalji_podatke(userData);
     }
@@ -56,7 +55,7 @@ export default function AzuriranjeDvorane() {
         const token = localStorage.getItem("token");
         const headers = { Authorization: `Bearer ${token}` };
         try {
-            const response = await axios.put(`http://localhost:3000/api/dvorane/${idDvorane}`, userData, {headers});
+            const response = await axios.put(`http://localhost:3000/api/azuriranjeDvorane/${id_dvorane}`, userData, {headers});
         } catch (error) {
             console.log("Greška prilikom ažuriranja dvorane:", error);
         }
@@ -64,24 +63,32 @@ export default function AzuriranjeDvorane() {
         navigate("/dvoraneAdministrator");
     }
 
+    const uloga = filteredDvorane.length > 0 ? filteredDvorane[0].svrha : '';
+
     return (
-        <div className="unos-dvorane-container">
+        <div className="unos-korisnika-container">
         <form className="login-form" onSubmit={spremi_podatke}>
             <div className="form-group">
                 <label htmlFor="naziv">Naziv dvorane: </label>
-                <input type="text" id="naziv" name="naziv" placeholder={dvorane.naziv || 'Unesite naziv'} required />
+                <input type="text" id="naziv" name="naziv" placeholder={filteredDvorane.length > 0 ? filteredDvorane[0].naziv : 'Unesite ime'} required />
             </div>
             <div className="form-group">
-                <label htmlFor="opis">Opis: </label>
-                <input type="text" id="opis" name="opis" placeholder={dvorane.opis || 'Unesite opis'} required />
-            </div>
-            <div className="form-group">
-                <label htmlFor="svrha">Svrha: </label>
-                <input type="text" id="svrha" name="svrha" placeholder={dvorane.svrha || 'Unesite svrhu'} required />
-            </div>
-            <div className="form-group">
-                <label htmlFor="aktivan">Aktivan: </label>
-                <input type="checkbox" id="aktivan" name="aktivan" defaultChecked={dvorane.aktivan} />
+                <label htmlFor="svrha">Uloga: </label>
+                <select id="svrha" name="svrha" required>
+                    {uloga === "predavanje" ? (
+                        <>
+                        <option value="predavanje">Predavanje</option>
+                        <option value="ispit">Ispit</option>
+                        
+                        </>
+                    ) : (
+                        <>
+                        <option value="ispit">Ispit</option>
+                        <option value="predavanje">Predavanje</option>
+                        </>
+                    )}
+                    
+                </select>
             </div>
             <button type="button" onClick={natrak_stisnuto}>Natrag</button>
             <button type="submit">Spremi</button>

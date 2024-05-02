@@ -41,7 +41,7 @@ function App() {
           <Route index element={<Pocetna />} />
           <Route path="pocetna" element={<Pocetna />} />
           <Route path="prijava" element={<Prijava />} />
-          <Route path="pojedineDvoraneSvi" element={<PojedineDvoraneSvi />} />
+          <Route path="/pojedineDvoraneSvi/:id_dvorane" element={<PojedineDvoraneSvi />} />
           <Route path="pojediniKolegijiSvi" element={<PojediniKolegijiSvi />} />
           <Route path="/PojediniKolegijiSvi/:idKolegija" element={<PojediniKolegijiSvi />} />
           <Route path="pojediniKolegijiPoStudijimaSvi" element={<PojediniKolegijiPoStudijimaSvi />} />
@@ -71,7 +71,7 @@ function App() {
           <Route path="/AzuriranjeStudijskihProgramaAdministrator/:idStudProg" element={<AzuriranjeStudijskihProgramaAdministrator />} />
           <Route path="odobravanjeTerminaDvoranaAdministrator" element={<OdobravanjeTerminaDvoranaAdministrator />} />
           <Route path="unosDvoranaAdministrator" element={<UnosDvoranaAdministrator />} />
-          <Route path="azuriranjeDvoranaAdministrator" element={<AzuriranjeDvoranaAdministrator />} />
+          <Route path="/azuriranjeDvoranaAdministrator/:id_dvorane" element={<AzuriranjeDvoranaAdministrator />} />
         </Route>
       </Routes>
     </BrowserRouter>

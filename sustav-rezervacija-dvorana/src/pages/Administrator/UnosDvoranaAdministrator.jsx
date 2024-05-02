@@ -13,12 +13,10 @@ export default function UnosDvoranaAdministrator() {
     const spremi_podatke = (event) => {
         event.preventDefault(); // Prevent the default form submission behavior
         const naziv = event.target.naziv.value;
-        const opis = event.target.opis.value;
         const svrha = event.target.svrha.value;
-        const aktivan = event.target.aktivan.value;
         
 
-        const userData = { naziv, opis, svrha, aktivan };
+        const userData = { naziv, svrha };
 
         posalji_podatke(userData);
     }
@@ -31,8 +29,8 @@ export default function UnosDvoranaAdministrator() {
         } catch (error) {
             console.log("Greška prilikom dohvata dvorana:", error);
         }
-        window.alert('Dvorana je  uspješno dodana.')
-        navigate("/listaDvoranaAdministrator");
+        window.alert('Dvorana je uspješno dodana.')
+        navigate("/dvoraneAdministrator");
     }
 
     return (
@@ -43,40 +41,15 @@ export default function UnosDvoranaAdministrator() {
                 <input type="text" id="naziv" name="naziv" required />
             </div>
             <div className="form-group">
-                <label htmlFor="Opis">Opis: </label>
-                <input type="text" id="opis" name="opis" required />
+                <label htmlFor="svrha">Uloga: </label>
+                <select id="svrha" name="svrha" required>
+                    <option value="predavanje">Predavanje</option>
+                    <option value="ispit">Ispit</option>
+                </select>
             </div>
-            <div className="form-group">
-                <label htmlFor="svrha">Svrha: </label>
-                <input type="text" id="svrha" name="svrha" required />
-            </div>
-            <div className="form-group">
-                <label htmlFor="aktivan">Aktivna: </label>
-                <input type="text" id="aktivan" name="aktivan" required />
-            </div>
-            
             <button type="button" onClick={natrak_stisnuto}>Natrag</button>
             <button type="submit">Spremi</button>
         </form>
     </div>
     )
 }
-
-
-   /* return (
-        <div className="unos-korisnika-container">
-        <form className="login-form">
-            <div className="form-group">
-                <label htmlFor="naziv">Naziv dvorane: </label>
-                <input type="text" id="naziv" name="naziv" required />
-            </div>
-            <div className="form-group">
-                <label htmlFor="opis">Opis dvorane: </label>
-                <input type="text" id="opis" name="opis" required />
-            </div>
-            <button type="button" onClick={natrak_stisnuto}>Natrag</button>
-            <button type="submit">Spremi</button>
-        </form>
-    </div>
-    )
-} */
