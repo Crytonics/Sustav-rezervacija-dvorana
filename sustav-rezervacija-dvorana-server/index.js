@@ -144,10 +144,10 @@ app.post('/api/unosKolegija', authJwt.verifyTokenAdmin, function (request, respo
 });
 
 // Unos nove dvorane (tablica "dvorane")
-app.post('/unosDvorane', authJwt.verifyTokenAdmin, function (request, response) {
+app.post('/api/unosDvorane', authJwt.verifyTokenAdmin, function (request, response) {
   const data = request.body;
-  const dvorana = [[data.id_dvorane, data.naziv,  data.opis, data.svrha, data.aktivan]]
-  connection.query('INSERT INTO dvorane (id_dvorane, naziv, opis, svrha, aktivan) VALUES ?',
+  const dvorana = [[data.id_dvorane, data.naziv, data.svrha, "1"]]
+  connection.query('INSERT INTO dvorane (id_dvorane, naziv, svrha, aktivan) VALUES ?',
   [dvorana], function (error, results, fields) {
     if (error) throw error;
     console.log('data', data)
@@ -219,10 +219,20 @@ app.get('/api/pojed_studijskiProgrami/:idStudProg', authJwt.verifyTokenAdmin, fu
 
 // Pregled/Dohvati dvorane (tablica "dvorane")
 app.get('/api/dvorane', (req, res) => {
-  connection.query("SELECT * FROM dvorane", (error, results) => {
+  connection.query("SELECT * FROM dvorane WHERE aktivan = '1'", (error, results) => {
     if (error) throw error;
 
     res.send(results);
+  });
+});
+
+// Pregled/Dohvati dvorane po id-u (tablica "dvorane")
+app.get('/api/pojed_dvorane/:id_dvorane', authJwt.verifyTokenAdmin, function (request, response) {
+  const id_dvorane = request.params.id_dvorane;
+  connection.query("SELECT * FROM dvorane WHERE aktivan = '1' AND id_dvorane = ?", [id_dvorane], function (error, results) {
+    if (error) throw error;
+
+    response.send(results);
   });
 });
 
@@ -282,11 +292,10 @@ app.put('/api/onemoguciKorisnika/:idKorisnika', authJwt.verifyTokenAdmin, functi
 
 
 // Onemogući dvorana (tablica "dvorane")
-app.put('/onemoguciDvoranu', authJwt.verifyTokenAdmin, function (request, response) {
-  const data = request.body;
-  connection.query('UPDATE dvorane SET aktivan = "0" WHERE id_dvorane = ?', [data.id_dvorane], function (error, results, fields) {
+app.put('/api/onemoguciDvoranu/:id_dvorane', authJwt.verifyTokenAdmin, function (request, response) {
+  const id_dvorane = request.params.id_dvorane;
+  connection.query('UPDATE dvorane SET aktivan = "0" WHERE id_dvorane = ?', [id_dvorane], function (error, results, fields) {
     if (error) throw error;
-    console.log('data', data)
     return response.send({ error: false, data: results, message: 'Dvorana je onemogućena.' });
   });
 });
@@ -374,6 +383,20 @@ app.put('/api/pojed_kolegiji/:idKolegija', authJwt.verifyTokenAdmin, function (r
   const idKolegija = request.params.idKolegija;
   const data = request.body;
     connection.query('UPDATE kolegij SET naziv = ?, id_korisnik = ?, id_studijskogPrograma = ? WHERE id_kolegija = ?', [data.naziv_kolegija, data.nastavnik, data.studijski_program, idKolegija], function (error, results, fields) {
+      if (error) {
+        console.error('Insert error:', error);
+        return response.status(500).send({ error: true, message: 'Error adding studijski program' });
+      }
+      console.log('Inserted data:', data);
+      return response.send({ error: false, data: results, message: 'Studijski program je dodan.' });
+  });
+});
+
+// Ažuriranje dvorana po id-u (tablica "dvorane")
+app.put('/api/azuriranjeDvorane/:id_dvorane', authJwt.verifyTokenAdmin, function (request, response) {
+  const id_dvorane = request.params.id_dvorane;
+  const data = request.body;
+    connection.query('UPDATE dvorane SET naziv = ?, svrha = ? WHERE id_dvorane = ?', [data.naziv, data.svrha, id_dvorane], function (error, results, fields) {
       if (error) {
         console.error('Insert error:', error);
         return response.status(500).send({ error: true, message: 'Error adding studijski program' });
