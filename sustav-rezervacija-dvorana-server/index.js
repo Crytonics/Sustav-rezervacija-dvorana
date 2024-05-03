@@ -260,7 +260,7 @@ app.get('/api/kolegiji', (req, res) => {
 });
 
 // Pregled/Dohvati kolegiji po korisniku(tablica "kolegij")
-app.get('/api/pojed_kolegiji', (req, res) => {
+app.get('/api/pojed_kolegiji', authJwt.verifyTokenAdminOrUser, (req, res) => {
   const id_korisnika = req.query.id_korisnika;
   connection.query(`
     SELECT 
