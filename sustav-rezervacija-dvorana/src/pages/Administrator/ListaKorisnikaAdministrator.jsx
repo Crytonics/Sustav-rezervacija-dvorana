@@ -60,7 +60,7 @@ export default function ListaKorisnikaAdministrator() {
     );
 
     const filteredStupci = stupci.filter(stupc =>
-        stupc.name.toLowerCase().includes(searchTerm.toLowerCase())
+        stupc.name.toLowerCase()
     );
 
     const navigate = useNavigate();
