@@ -17,8 +17,8 @@ export default  function AzuriranjeKolegijaAdministrator() {
     const { idKolegija } = useParams()
 
     const [korisnici, setKorisnici] = useState([]);
-
     const [kolegiji, setKolegiji] = useState([]);
+    const [naziv, setNaziv] = useState([]);
 
     const filteredKolegiji = kolegiji.filter(kolegij =>
         kolegij.naziv_kolegija.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -34,6 +34,10 @@ export default  function AzuriranjeKolegijaAdministrator() {
     const filteredStudenskiProgrami = studenskiProgrami.filter(studprog =>
         studprog.naziv.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    const handleNazivChange = (event) => {
+        setNaziv(event.target.value);
+    };
 
     useEffect(() => {
         async function fetchInitialData() {
@@ -53,6 +57,9 @@ export default  function AzuriranjeKolegijaAdministrator() {
 
                 const response2 = await axios.get(`http://localhost:3000/api/pojed_kolegiji/${idKolegija}`, { headers });
                 setKolegiji(response2.data);
+                if (response2.data.length > 0) {
+                    setNaziv(response2.data[0].naziv_kolegija);
+                }
               
             } catch (error) {
                 console.log("Greška prilikom dohvata podataka:", error);
@@ -92,13 +99,15 @@ export default  function AzuriranjeKolegijaAdministrator() {
         <form className="login-form" onSubmit={spremi_podatke}>
             <div className="form-group">
                 <label htmlFor="naziv_kolegija">Naziv kolegija: </label>
-                <input type="text" id="naziv_kolegija" name="naziv_kolegija" placeholder={filteredKolegiji.length > 0 ? filteredKolegiji[0].naziv_kolegija : 'Unesite ime'} required />
+                <input type="text" id="naziv_kolegija" name="naziv_kolegija" value={naziv} onChange={handleNazivChange} required />
             </div>
             <div className="form-group">
                 <label htmlFor="Nastavnik">Nastavnik: </label>
                 <select id="nastavnik" name="nastavnik" required>
-                    <option value="">Odaberite nastavnika</option>
-                    {filteredKorisnici.map((korisnik) => (
+                <option value={filteredKorisnici.length > 0 ? filteredKorisnici[0].id_korisnik : ""}>
+                        {filteredKorisnici.length > 0 ? `${filteredKorisnici[0].ime} ${filteredKorisnici[0].prezime}` : "Odaberite nastavnika"}
+                    </option>
+                    {filteredKorisnici.slice(1).map((korisnik) => (
                         <option key={korisnik.id_korisnik} value={korisnik.id_korisnik}>
                             {korisnik.ime} {korisnik.prezime}
                         </option>
@@ -108,8 +117,8 @@ export default  function AzuriranjeKolegijaAdministrator() {
             <div className="form-group">
                 <label htmlFor="Nastavnik">Studijski program: </label>
                 <select id="studijski_program" name="studijski_program" required>
-                    <option value="">Odaberite studijski program</option>
-                    {filteredStudenskiProgrami.map((program) => (
+                    <option value={filteredStudenskiProgrami.length > 0 ? filteredStudenskiProgrami[0].id_studijskogPrograma : ""}>{filteredStudenskiProgrami.length > 0 ? filteredStudenskiProgrami[0].naziv : "Odaberite studijski program"}</option>
+                    {filteredStudenskiProgrami.slice(1).map((program) => (
                         <option key={program.id_studijskogPrograma} value={program.id_studijskogPrograma}>
                             {program.naziv}
                         </option>

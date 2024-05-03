@@ -13,12 +13,17 @@ export default function AzuriranjeStudijskihProgramaAdministrator() {
     }
 
     const [studenskiProgrami, setStudenskiProgrami] = useState([]);
+    const [naziv, setNaziv] = useState([]);
 
     const { idStudProg } = useParams()
 
     const filteredStudenskiProgrami = studenskiProgrami.filter(studprog =>
         studprog.naziv.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    const handleNazivChange = (event) => {
+        setNaziv(event.target.value);
+    };
 
     useEffect(() => {
         async function fetchInitialData() {
@@ -32,8 +37,9 @@ export default function AzuriranjeStudijskihProgramaAdministrator() {
             try {
                 const response = await axios.get(`http://localhost:3000/api/pojed_studijskiProgrami/${idStudProg}`, { headers });
                 setStudenskiProgrami(response.data);
-              
-                
+                if (response.data.length > 0) {
+                    setNaziv(response.data[0].naziv);
+                }
                 
             } catch (error) {
                 console.log("Greška prilikom dohvata studijskog programa:", error);
@@ -71,7 +77,7 @@ export default function AzuriranjeStudijskihProgramaAdministrator() {
         <form className="login-form" onSubmit={spremi_podatke}>
             <div className="form-group">
                 <label htmlFor="naziv">Naziv studija: </label>
-                <input type="text" id="naziv" name="naziv" placeholder={filteredStudenskiProgrami.length > 0 ? filteredStudenskiProgrami[0].naziv : 'Unesite ime'} required />
+                <input type="text" id="naziv" name="naziv" value={naziv} onChange={handleNazivChange} required />
             </div>
             <button type="button" onClick={natrak_stisnuto}>Natrag</button>
             <button type="submit">Spremi</button>
