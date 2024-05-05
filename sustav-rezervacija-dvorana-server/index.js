@@ -155,6 +155,16 @@ app.post('/api/unosDvorane', authJwt.verifyTokenAdmin, function (request, respon
   });
 });
 
+// Unos entry (tablica "entry")
+app.post('/api/unosEntry', authJwt.verifyTokenAdminOrUser, function (request, response) {
+  const data = request.body;
+  const entry = [[data.id_entry, "", data.svrha, data.status, data.pocetak_vrijeme, data.kraj_vrijeme, data.dvorana, data.id_korisnika, data.idKolegija, data.idStudijskiProgram, data.datum, data.date_ponavljanje, data.ponavljanje]]
+  connection.query('INSERT INTO entry (id_entry, naziv, svrha, status, start_time, end_time, id_dvorane, id_korisnik, id_kolegij, id_studijskiProgrami, start_date, end_date, ponavljanje) VALUES ?', [entry], function (error, results, fields) {
+    if (error) throw error;
+    return response.send({ error: false, data: results, message: 'Korisnik je dodan.' });
+  });
+});
+
 // Prelged/Dohvati zauzeća dvorane (tablica "entry")
 app.get("/api/entry/:id", (req, res) => {
   const { id } = req.params;
@@ -268,6 +278,58 @@ app.get('/api/pojed_kolegiji', authJwt.verifyTokenAdminOrUser, (req, res) => {
       k.naziv AS naziv_kolegija, 
       CONCAT(kor.ime, ' ', kor.prezime, ' (', kor.korisnicko_ime, ')') AS korisnicko_ime, 
       sp.naziv AS naziv_studijskog_programa
+    FROM kolegij k
+    INNER JOIN korisnici kor ON k.id_korisnik = kor.id_korisnik
+    INNER JOIN studijskiProgrami sp ON k.id_studijskogPrograma = sp.id_studijskogPrograma
+    WHERE k.aktivan = '1' AND kor.aktivan = '1' AND sp.aktivan = '1' AND k.id_korisnik = ?;
+  `, [id_korisnika], function (error, results) {
+    if (error) {
+      console.error("Error fetching data:", error);
+      return res.status(500).json({ error: true, message: "Error fetching data from database." });
+    }
+    res.send(results);
+  });
+});
+
+// Prelged/Dohvati zauzeća dvorane (tablica "entry")
+app.get("/api/entry_korisnik", (req, res) => {
+  const id_korisnika = req.query.id_korisnika;
+
+  connection.query(
+    `SELECT 
+      e.id_entry,
+      kole.naziv AS kolegij,
+      dvo.naziv AS dvorana,
+      e.start_date AS datum,
+      CONCAT(e.start_time, ' - ', e.end_time) AS vrijeme,
+      e.svrha,
+      e.ponavljanje,
+      e.status
+    FROM entry e
+    INNER JOIN kolegij kole ON e.id_kolegij = kole.id_kolegija
+    INNER JOIN dvorane dvo ON e.id_dvorane = dvo.id_dvorane
+    WHERE e.id_korisnik = ?;
+    `, [id_korisnika], (error, results) => {
+        if (error) throw error;
+        const formattedResults = results.map(result => ({
+          ...result,
+          datum: new Date(result.datum).toISOString().split('T')[0],
+          vrijeme: result.vrijeme.split(' - ').map(time => time.slice(0, 5)).join(' - ')
+        }));
+        res.send(formattedResults);
+      }
+  );
+});
+
+// Pregled/Dohvati kolegiji po korisniku (dobije se id studijskog programa)(tablica "kolegij")
+app.get('/api/pojed_kolegiji_sp_id', authJwt.verifyTokenAdminOrUser, (req, res) => {
+  const id_korisnika = req.query.id_korisnika;
+  connection.query(`
+    SELECT 
+      k.id_kolegija, 
+      k.naziv AS naziv_kolegija, 
+      CONCAT(kor.ime, ' ', kor.prezime, ' (', kor.korisnicko_ime, ')') AS korisnicko_ime, 
+      sp.id_studijskogPrograma
     FROM kolegij k
     INNER JOIN korisnici kor ON k.id_korisnik = kor.id_korisnik
     INNER JOIN studijskiProgrami sp ON k.id_studijskogPrograma = sp.id_studijskogPrograma
