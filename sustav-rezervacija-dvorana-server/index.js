@@ -292,7 +292,7 @@ app.get('/api/pojed_kolegiji', authJwt.verifyTokenAdminOrUser, (req, res) => {
 });
 
 // Prelged/Dohvati zauzeća dvorane (tablica "entry")
-app.get("/api/entry_korisnik", (req, res) => {
+app.get("/api/entry_korisnik", authJwt.verifyTokenAdminOrUser, (req, res) => {
   const id_korisnika = req.query.id_korisnika;
 
   connection.query(
