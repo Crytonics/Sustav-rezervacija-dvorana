@@ -1,8 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import axios from 'axios';
+import { jwtDecode } from "jwt-decode";
 
 export default function PregledSvojihKolegijaNastavnici() {
+
+    const decodeToken = (token) => {
+        try {
+            const decoded = jwtDecode(token);
+            return decoded.uloga;
+
+        } catch (error) {
+            console.error("Error decoding token:", error);
+            return null;
+        }
+    };
+
+    const isAdminOrNastavnik = (token, headers) => {
+        if (!token) {
+            navigate('/odbijenPristup');
+            return false;
+        }
+    
+        const role = decodeToken(token);
+        if (role !== "admin" && role !== "nastavnik") {
+            navigate('/odbijenPristup');
+            return false;
+        }
+
+        // Dobivanje informacija iz tokena
+        var base64Url = token.split('.')[1];
+        var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+
+        // Id iz tokena
+        var payloadObj = JSON.parse(jsonPayload);
+        const id_korisnika = (payloadObj.id);
+    
+        dohvatiKolegija(id_korisnika, headers);
+        return true;
+    };
 
     const [searchTerm, setSearchTerm] = useState('');
     
@@ -59,18 +98,9 @@ export default function PregledSvojihKolegijaNastavnici() {
             // Set up the request headers to include the JWT token
             const headers = { Authorization: `Bearer ${token}` };
 
-            // Dobivanje informacija iz tokena
-            var base64Url = token.split('.')[1];
-            var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
+            decodeToken(token);
 
-            // Id iz tokena
-            var payloadObj = JSON.parse(jsonPayload);
-            const id_korisnika = (payloadObj.id);
-
-            dohvatiKolegija(id_korisnika, headers);
+            isAdminOrNastavnik(token, headers);
         }
 
         fetchInitialData();

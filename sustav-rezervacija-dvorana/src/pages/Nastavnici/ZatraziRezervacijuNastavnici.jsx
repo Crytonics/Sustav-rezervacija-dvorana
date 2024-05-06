@@ -1,8 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, Outlet, useNavigate, useParams } from "react-router-dom";
 import axios from 'axios';
+import { jwtDecode } from "jwt-decode";
 
 export default function ZatraziRezervacijuNastavnici() {
+
+    const decodeToken = (token) => {
+        try {
+            const decoded = jwtDecode(token);
+            return decoded.uloga;
+
+        } catch (error) {
+            console.error("Error decoding token:", error);
+            return null;
+        }
+    };
+
+    const isAdminOrNastavnik = (token, headers) => {
+        if (!token) {
+            navigate('/odbijenPristup');
+            return false;
+        }
+    
+        const role = decodeToken(token);
+        if (role !== "admin" && role !== "nastavnik") {
+            navigate('/odbijenPristup');
+            return false;
+        }
+
+        // Dobivanje informacija iz tokena
+        var base64Url = token.split('.')[1];
+        var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+
+        // Id iz tokena
+        var payloadObj = JSON.parse(jsonPayload);
+        const id_korisnika = (payloadObj.id);
+    
+        dohvatiPodatke(id_korisnika, headers);
+        return true;
+    };
 
     const navigate = useNavigate();
 
@@ -60,40 +99,35 @@ export default function ZatraziRezervacijuNastavnici() {
             // Set up the request headers to include the JWT token
             const headers = { Authorization: `Bearer ${token}` }; 
 
-            // Dobivanje informacija iz tokena
-            var base64Url = token.split('.')[1];
-            var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
-
-            // Id iz tokena
-            var payloadObj = JSON.parse(jsonPayload);
-            setId_korisnika(payloadObj.id); 
-
             setPonavljanje("0");
 
-            try {
-                const response = await axios.get(`http://localhost:3000/api/pojed_kolegiji_sp_id?id_korisnika=${payloadObj.id}`, {headers});
-                setKolegiji(response.data);
+            decodeToken(token);
 
-                const response1 = await axios.get(`http://localhost:3000/api/studijskiProgrami`, { headers });
-                setStudenskiProgrami(response1.data);
-
-                const response2 = await axios.get(`http://localhost:3000/api/dvorane`, { headers });
-                setDvorane(response2.data);
-
-                const response3 = await axios.get(`http://localhost:3000/api/rezervacije`, { headers });
-                setEntry(response3.data);
-              
-            } catch (error) {
-                console.log("Greška prilikom dohvata podataka:", error);
-            } 
+            isAdminOrNastavnik(token, headers);
             
         }
 
         fetchInitialData();
     }, []);
+
+    const dohvatiPodatke = async (id_korisnika, headers) => {
+        try {
+            const response = await axios.get(`http://localhost:3000/api/pojed_kolegiji_sp_id?id_korisnika=${id_korisnika}`, {headers});
+            setKolegiji(response.data);
+
+            const response1 = await axios.get(`http://localhost:3000/api/studijskiProgrami`, { headers });
+            setStudenskiProgrami(response1.data);
+
+            const response2 = await axios.get(`http://localhost:3000/api/dvorane`, { headers });
+            setDvorane(response2.data);
+
+            const response3 = await axios.get(`http://localhost:3000/api/rezervacije`, { headers });
+            setEntry(response3.data);
+          
+        } catch (error) {
+            console.log("Greška prilikom dohvata podataka:", error);
+        } 
+    }
 
     const spremi_podatke = (event) => {
         event.preventDefault(); // Prevent the default form submission behavior
