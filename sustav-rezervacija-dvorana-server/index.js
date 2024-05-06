@@ -298,6 +298,7 @@ app.get("/api/entry_korisnik", authJwt.verifyTokenAdminOrUser, (req, res) => {
   connection.query(
     `SELECT 
       e.id_entry,
+      e.id_kolegij,
       kole.naziv AS kolegij,
       dvo.naziv AS dvorana,
       e.start_date AS datum,
@@ -315,6 +316,43 @@ app.get("/api/entry_korisnik", authJwt.verifyTokenAdminOrUser, (req, res) => {
           ...result,
           datum: new Date(result.datum).toISOString().split('T')[0],
           vrijeme: result.vrijeme.split(' - ').map(time => time.slice(0, 5)).join(' - ')
+        }));
+        res.send(formattedResults);
+      }
+  );
+});
+
+// Prelged/Dohvati zauzeća dvorane pa id-u(tablica "entry")
+app.get("/api/entry_kolegij/:idKolegija", authJwt.verifyTokenAdminOrUser, (req, res) => {
+  const idKolegija = req.params.idKolegija;
+
+  connection.query(
+    `SELECT 
+      e.id_entry,
+      e.id_kolegij,
+      kole.naziv AS kolegij,
+      dvo.naziv AS dvorana,
+      e.start_date AS datum,
+      e.end_date,
+      e.id_dvorane,
+      e.start_time,
+      e.id_studijskiProgrami,
+      e.end_time,
+      e.svrha,
+      e.ponavljanje,
+      e.status
+    FROM entry e
+    INNER JOIN kolegij kole ON e.id_kolegij = kole.id_kolegija
+    INNER JOIN dvorane dvo ON e.id_dvorane = dvo.id_dvorane
+    WHERE e.id_kolegij = ?;
+    `, [idKolegija], (error, results) => {
+        if (error) throw error;
+        const formattedResults = results.map(result => ({
+          ...result,
+          datum: new Date(result.datum).toISOString().split('T')[0],
+          start_time: result.start_time.slice(0, 5),
+          end_time: result.end_time.slice(0, 5),
+          end_date: new Date(result.end_date).toISOString().split('T')[0]
         }));
         res.send(formattedResults);
       }
@@ -504,6 +542,51 @@ app.post('/api/unosKolegija', authJwt.verifyTokenAdmin, function (request, respo
       return response.send({ error: false, data: results, message: 'Kolegij je dodan.' });
     }
   );
+});
+
+// Ažuriranje entry (tablica "entry")
+app.put('/api/azuriranjeEntry/:id_entry', authJwt.verifyTokenAdminOrUser, function (request, response) {
+  const id_entry = request.params.id_entry;
+  const data = request.body;
+
+  const sqlQuery = `
+    UPDATE entry 
+    SET 
+      svrha = ?,
+      status = ?,
+      start_time = ?,
+      end_time = ?,
+      id_dvorane = ?,
+      id_korisnik = ?,
+      id_kolegij = ?,
+      id_studijskiProgrami = ?,
+      start_date = ?,
+      end_date = ?,
+      ponavljanje = ?
+    WHERE id_entry = ?`;
+
+  const values = [
+    data.svrha, 
+    data.status, 
+    data.pocetak_vrijeme, 
+    data.kraj_vrijeme, 
+    data.idDvorane, 
+    data.id_korisnika, 
+    data.id_kolegija, 
+    data.idStudijskiProgram, 
+    data.datum, 
+    data.date_ponavljanje, 
+    data.ponavljanje,
+    id_entry
+  ];
+
+  connection.query(sqlQuery, values, function (error, results, fields) {
+    if (error) {
+      console.error("Error updating entry:", error);
+      return response.status(500).send({ error: true, message: 'Error updating entry' });
+    }
+    return response.send({ error: false, data: results, message: 'Entry updated successfully.' });
+  });
 });
 
 app.listen(port, () => {
