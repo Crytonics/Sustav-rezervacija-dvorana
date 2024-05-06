@@ -5,28 +5,29 @@ import { jwtDecode } from "jwt-decode";
 
 export default function UnosStudijskihProgramaAdministrator() {
 
-    const isAdmin = (token, headers) => {
-        if (isAuthenticated() && token) {
-            const decodeToken = (token) => {
-                try {
-                    const decoded = jwtDecode(token);
-                    return decoded.uloga;
-                } catch (error) {
-                    console.error("Error decoding token:", error);
-                    return null;
-                }
-            };
-
-            return decodeToken(token) === "admin";
-        } else {
-            navigate('/odbijenPristup');
+    const decodeToken = (token) => {
+        try {
+            const decoded = jwtDecode(token);
+            return decoded.uloga;
+        } catch (error) {
+            console.error("Error decoding token:", error);
+            return null;
         }
-        return false;
     };
 
-    const isAuthenticated = () => {
-        const token = localStorage.getItem("token");
-        return !!token;
+    const isAdmin = (token, headers) => {
+        if (!token) {
+            navigate('/odbijenPristup');
+            return false;
+        }
+    
+        const role = decodeToken(token);
+        if (role !== "admin") {
+            navigate('/odbijenPristup');
+            return false;
+        }
+    
+        return true;
     };
 
     const navigate = useNavigate();
@@ -55,6 +56,8 @@ export default function UnosStudijskihProgramaAdministrator() {
         const naziv_studija = event.target.naziv.value;
 
         const userData = { naziv_studija };
+
+        decodeToken(token);
 
         posalji_podatke(userData);
     }

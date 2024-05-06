@@ -5,28 +5,29 @@ import { jwtDecode } from "jwt-decode";
 
 export default function UnosKorisnikaAdministrator() {
 
-    const isAdmin = (token, headers) => {
-        if (isAuthenticated() && token) {
-            const decodeToken = (token) => {
-                try {
-                    const decoded = jwtDecode(token);
-                    return decoded.uloga;
-                } catch (error) {
-                    console.error("Error decoding token:", error);
-                    return null;
-                }
-            };
-
-            return decodeToken(token) === "admin";
-        } else {
-            navigate('/odbijenPristup');
+    const decodeToken = (token) => {
+        try {
+            const decoded = jwtDecode(token);
+            return decoded.uloga;
+        } catch (error) {
+            console.error("Error decoding token:", error);
+            return null;
         }
-        return false;
     };
 
-    const isAuthenticated = () => {
-        const token = localStorage.getItem("token");
-        return !!token;
+    const isAdmin = (token, headers) => {
+        if (!token) {
+            navigate('/odbijenPristup');
+            return false;
+        }
+    
+        const role = decodeToken(token);
+        if (role !== "admin") {
+            navigate('/odbijenPristup');
+            return false;
+        }
+    
+        return true;
     };
 
     const navigate = useNavigate();
@@ -42,6 +43,8 @@ export default function UnosKorisnikaAdministrator() {
         
             // Set up the request headers to include the JWT token
             const headers = { Authorization: `Bearer ${token}` };
+
+            decodeToken(token);
 
             isAdmin(token, headers);
 

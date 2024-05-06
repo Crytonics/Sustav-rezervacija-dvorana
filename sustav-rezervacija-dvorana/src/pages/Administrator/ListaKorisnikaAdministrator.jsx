@@ -5,29 +5,30 @@ import { jwtDecode } from "jwt-decode";
 
 export default function ListaKorisnikaAdministrator() {
 
-    const isAdmin = (token, headers) => {
-        if (isAuthenticated() && token) {
-            const decodeToken = (token) => {
-                try {
-                    const decoded = jwtDecode(token);
-                    return decoded.uloga;
-                } catch (error) {
-                    console.error("Error decoding token:", error);
-                    return null;
-                }
-            };
-
-            dohvatiKorisnike(headers);
-            return decodeToken(token) === "admin";
-        } else {
-            navigate('/odbijenPristup');
+    const decodeToken = (token) => {
+        try {
+            const decoded = jwtDecode(token);
+            return decoded.uloga;
+        } catch (error) {
+            console.error("Error decoding token:", error);
+            return null;
         }
-        return false;
     };
 
-    const isAuthenticated = () => {
-        const token = localStorage.getItem("token");
-        return !!token;
+    const isAdmin = (token, headers) => {
+        if (!token) {
+            navigate('/odbijenPristup');
+            return false;
+        }
+    
+        const role = decodeToken(token);
+        if (role !== "admin") {
+            navigate('/odbijenPristup');
+            return false;
+        }
+    
+        dohvatiKorisnike(headers);
+        return true;
     };
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -107,6 +108,8 @@ export default function ListaKorisnikaAdministrator() {
         
             // Set up the request headers to include the JWT token
             const headers = { Authorization: `Bearer ${token}` };
+
+            decodeToken(token);
 
             isAdmin(token, headers);
 
