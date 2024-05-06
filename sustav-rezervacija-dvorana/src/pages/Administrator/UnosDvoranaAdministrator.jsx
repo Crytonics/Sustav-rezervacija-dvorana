@@ -1,14 +1,54 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import axios from 'axios';
+import { jwtDecode } from "jwt-decode";
 
 export default function UnosDvoranaAdministrator() {
+
+    const isAdmin = (token, headers) => {
+        if (isAuthenticated() && token) {
+            const decodeToken = (token) => {
+                try {
+                    const decoded = jwtDecode(token);
+                    return decoded.uloga;
+                } catch (error) {
+                    console.error("Error decoding token:", error);
+                    return null;
+                }
+            };
+
+            return decodeToken(token) === "admin";
+        } else {
+            navigate('/odbijenPristup');
+        }
+        return false;
+    };
+
+    const isAuthenticated = () => {
+        const token = localStorage.getItem("token");
+        return !!token;
+    };
 
     const navigate = useNavigate();
 
     const natrak_stisnuto = () => {
         navigate("/dvoraneAdministrator");
     }
+
+    useEffect(() => {
+        async function fetchInitialData() {
+
+            // Get the JWT token from local storage
+            const token = localStorage.getItem("token");
+        
+            // Set up the request headers to include the JWT token
+            const headers = { Authorization: `Bearer ${token}` }; 
+            
+            isAdmin(token, headers);
+        }
+
+        fetchInitialData();
+    }, []);
 
     const spremi_podatke = (event) => {
         event.preventDefault(); // Prevent the default form submission behavior

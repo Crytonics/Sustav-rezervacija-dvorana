@@ -1,8 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, Outlet, useNavigate, useParams } from "react-router-dom";
 import axios from 'axios';
+import { jwtDecode } from "jwt-decode";
 
 export default function AzuriranjeKorisnikaAdministrator() {
+
+    const isAdmin = (token, headers) => {
+        if (isAuthenticated() && token) {
+            const decodeToken = (token) => {
+                try {
+                    const decoded = jwtDecode(token);
+                    return decoded.uloga;
+                } catch (error) {
+                    console.error("Error decoding token:", error);
+                    return null;
+                }
+            };
+
+            dohvatiPodatke(headers);
+            return decodeToken(token) === "admin";
+        } else {
+            navigate('/odbijenPristup');
+        }
+        return false;
+    };
+
+    const isAuthenticated = () => {
+        const token = localStorage.getItem("token");
+        return !!token;
+    };
 
     const navigate = useNavigate();
 
@@ -39,7 +65,21 @@ export default function AzuriranjeKorisnikaAdministrator() {
         setKorisnicko_ime(event.target.value); // Update state on user input
     };
     
-
+    const dohvatiPodatke = async (headers) => {
+        try {
+            const response = await axios.get(`http://localhost:3000/api/pojed_korisnici/${idKorisnika}`, { headers });
+            setKorisnici(response.data);
+            
+            if (response.data.length > 0) {
+                setIme(response.data[0].ime);
+                setPrezime(response.data[0].prezime);
+                setKorisnicko_ime(response.data[0].korisnicko_ime);
+            }
+            
+        } catch (error) {
+            console.log("Greška prilikom dohvata korisnika:", error);
+        } 
+    }
     
     useEffect(() => {
         async function fetchInitialData() {
@@ -49,23 +89,8 @@ export default function AzuriranjeKorisnikaAdministrator() {
         
             // Set up the request headers to include the JWT token
             const headers = { Authorization: `Bearer ${token}` }; 
-
-            try {
-                const response = await axios.get(`http://localhost:3000/api/pojed_korisnici/${idKorisnika}`, { headers });
-                setKorisnici(response.data);
-                
-                if (response.data.length > 0) {
-                    setIme(response.data[0].ime);
-                    setPrezime(response.data[0].prezime);
-                    setKorisnicko_ime(response.data[0].korisnicko_ime);
-                }
-                
-            } catch (error) {
-                console.log("Greška prilikom dohvata korisnika:", error);
-            } 
-            console.log(korisnici);
             
-            
+            isAdmin(token, headers);
         }
 
         fetchInitialData();

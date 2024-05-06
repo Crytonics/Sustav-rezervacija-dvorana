@@ -1,8 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import axios from 'axios';
+import { jwtDecode } from "jwt-decode";
 
 export default  function StudijskiProgramiAdministrator() {
+
+    const isAdmin = (token, headers) => {
+        if (isAuthenticated() && token) {
+            const decodeToken = (token) => {
+                try {
+                    const decoded = jwtDecode(token);
+                    return decoded.uloga;
+                } catch (error) {
+                    console.error("Error decoding token:", error);
+                    return null;
+                }
+            };
+
+            dohvatiStudijskePrograme(headers);
+            return decodeToken(token) === "admin";
+        } else {
+            navigate('/odbijenPristup');
+        }
+        return false;
+    };
+
+    const isAuthenticated = () => {
+        const token = localStorage.getItem("token");
+        return !!token;
+    };
 
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -58,7 +84,7 @@ export default  function StudijskiProgramiAdministrator() {
             // Set up the request headers to include the JWT token
             const headers = { Authorization: `Bearer ${token}` };
 
-            dohvatiStudijskePrograme(headers);
+            isAdmin(token, headers);
         }
 
         fetchInitialData();

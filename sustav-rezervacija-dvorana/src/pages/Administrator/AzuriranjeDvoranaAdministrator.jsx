@@ -1,8 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import axios from 'axios';
+import { jwtDecode } from "jwt-decode";
 
 export default function AzuriranjeDvorane() {
+
+    const isAdmin = (token, headers) => {
+        if (isAuthenticated() && token) {
+            const decodeToken = (token) => {
+                try {
+                    const decoded = jwtDecode(token);
+                    return decoded.uloga;
+                } catch (error) {
+                    console.error("Error decoding token:", error);
+                    return null;
+                }
+            };
+
+            dohvatiPodatke(headers);
+            return decodeToken(token) === "admin";
+        } else {
+            navigate('/odbijenPristup');
+        }
+        return false;
+    };
+
+    const isAuthenticated = () => {
+        const token = localStorage.getItem("token");
+        return !!token;
+    };
 
     const navigate = useNavigate();
 
@@ -31,20 +57,23 @@ export default function AzuriranjeDvorane() {
             const token = localStorage.getItem("token");
             const headers = { Authorization: `Bearer ${token}` }; 
 
-            try {
-                const response = await axios.get(`http://localhost:3000/api/pojed_dvorane/${id_dvorane}`, { headers });
-                setDvorane(response.data);
-                if (response.data.length > 0) {
-                    setNaziv(response.data[0].naziv);
-                }
-            } catch (error) {
-                console.log("Greška prilikom dohvata podataka:", error);
-            }
-            console.log(id_dvorane);
+            isAdmin(token, headers);
         }
 
         fetchInitialData();
     }, []);
+
+    const dohvatiPodatke = async (headers) => {
+        try {
+            const response = await axios.get(`http://localhost:3000/api/pojed_dvorane/${id_dvorane}`, { headers });
+            setDvorane(response.data);
+            if (response.data.length > 0) {
+                setNaziv(response.data[0].naziv);
+            }
+        } catch (error) {
+            console.log("Greška prilikom dohvata podataka:", error);
+        }
+    }
 
     const spremi_podatke = (event) => {
         event.preventDefault();

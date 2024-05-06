@@ -2,6 +2,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import MainLayout from "./layouts/MainLayout";
 
+import NotFoundPage from './pages/NotFoundPage';
+import OdbijenPristup from "./pages/odbijenPristup.jsx";
+
 import Prijava from './pages/prijava';
 import Pocetna from './pages/pocetna';
 import PojedineDvoraneSvi from "./pages/Svi/PojedineDvoraneSvi";
@@ -72,6 +75,9 @@ function App() {
           <Route path="odobravanjeTerminaDvoranaAdministrator" element={<OdobravanjeTerminaDvoranaAdministrator />} />
           <Route path="unosDvoranaAdministrator" element={<UnosDvoranaAdministrator />} />
           <Route path="/azuriranjeDvoranaAdministrator/:id_dvorane" element={<AzuriranjeDvoranaAdministrator />} />
+          
+          <Route path="odbijenPristup" element={<OdbijenPristup />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
