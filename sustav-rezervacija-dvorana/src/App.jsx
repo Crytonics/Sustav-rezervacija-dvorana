@@ -56,7 +56,7 @@ function App() {
           <Route path="zatraziRezervacijuNastavnici" element={<ZatraziRezervacijuNastavnici />} />
           <Route path="pregledSvojihRezervacijaNastavnici" element={<PregledSvojihRezervacijaNastavnici />} />
           <Route path="pregledSvojihKolegijaNastavnici" element={<PregledSvojihKolegijaNastavnici />} />
-          <Route path="azuriranjeSvojihRezervacija" element={<AzuriranjeSvojihRezervacija />} />
+          <Route path="/AzuriranjeSvojihRezervacija/:idKolegija" element={<AzuriranjeSvojihRezervacija />} />
 
           <Route path="listaKorisnikaAdministrator" element={<ListaKorisnikaAdministrator />} />
           <Route path="unosKorisnikaAdministrator" element={<UnosKorisnikaAdministrator />} />

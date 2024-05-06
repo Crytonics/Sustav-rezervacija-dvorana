@@ -122,7 +122,8 @@ export default function PregledSvojihRezervacijaNastavnici() {
         zahtjev.vrijeme.toLowerCase().includes(searchTerm.toLowerCase()) ||
         zahtjev.svrha.toLowerCase().includes(searchTerm.toLowerCase()) ||
         zahtjev.ponavljanje.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        zahtjev.status.toLowerCase().includes(searchTerm.toLowerCase())
+        zahtjev.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        zahtjev.id_kolegij.toLowerCase()
     );
 
     const filteredStupci = stupci.filter(stupc =>
@@ -133,6 +134,10 @@ export default function PregledSvojihRezervacijaNastavnici() {
 
     const vidi_stisnuto = (idKolegija) => {
         navigate(`/pojediniKolegijiSvi/${idKolegija}`);
+    }
+
+    const uredi_stisnuto = async (idKolegija) => {
+        navigate(`/AzuriranjeSvojihRezervacija/${idKolegija}`);
     }
 
     useEffect(() => {
@@ -207,7 +212,8 @@ export default function PregledSvojihRezervacijaNastavnici() {
                             <td>{zahtjev.ponavljanje }</td>
                             <td>{zahtjev.status }</td>
                             <td>
-                            <button className="gumb_vidi" onClick={() => vidi_stisnuto(zahtjevi.id_kolegija)}>Vidi</button>
+                            <button className="gumb_vidi" onClick={() => vidi_stisnuto(zahtjev.id_kolegij)}>Vidi</button>
+                            <button className="gumb_uredi" onClick={() => uredi_stisnuto(zahtjev.id_kolegij)}>Uredi</button>
                             </td>
                         </tr>
                     ))}

@@ -38,6 +38,7 @@ export default function ZatraziRezervacijuNastavnici() {
         // Id iz tokena
         var payloadObj = JSON.parse(jsonPayload);
         const id_korisnika = (payloadObj.id);
+        setId_korisnika(payloadObj.id);
     
         dohvatiPodatke(id_korisnika, headers);
         return true;
