@@ -68,7 +68,7 @@ app.post("/api/login", function (req, res) {
       bcrypt.compare(password, result[0].lozinka, function (err, bcryptRes) {
         if (bcryptRes) {
           // Generate JWT token
-          const token = jwt.sign({ id: result[0].id_korisnik, korisnicko_ime: result[0].korisnicko_ime, uloga: result[0].uloga }, config.secret);
+          const token = jwt.sign({ id: result[0].id_korisnik, korisnicko_ime: result[0].korisnicko_ime, uloga: result[0].uloga }, config.secret, { expiresIn: '1d' });
           res.status(200).json({ success: true, message: "Login successful", token: token });
           console.log("Token: ", token);
         } else {
@@ -165,7 +165,7 @@ app.post('/api/unosEntry', authJwt.verifyTokenAdminOrUser, function (request, re
   });
 });
 
-// Unos entry (tablica "entry")
+// Unos entry Administrator (tablica "entry")
 app.post('/api/unosEntryAdmin', authJwt.verifyTokenAdmin, function (request, response) {
   const data = request.body;
   const entry = [[data.id_entry, "", data.svrha, data.status, data.pocetak_vrijeme, data.kraj_vrijeme, data.dvorana, data.korisnik, data.idKolegija, data.idStudijskiProgram, data.datum, data.datePonavljanje, data.ponavljanje]]
@@ -175,7 +175,25 @@ app.post('/api/unosEntryAdmin', authJwt.verifyTokenAdmin, function (request, res
   });
 });
 
-// Prelged/Dohvati zauzeća dvorane (tablica "entry")
+// Odobri zahtjev za rezervaciju dvotana (tablica "entry")
+app.put('/api/odobriEntry/:id_entry', authJwt.verifyTokenAdmin, function (request, response) {
+  const id_entry = request.params.id_entry;
+  connection.query('UPDATE entry SET status = "aktivno" WHERE id_entry = ?', [id_entry], function (error, results) {
+    if (error) throw error;
+    response.send(results);
+  });
+});
+
+// Odbaci zahtjev za rezervaciju dvotana (tablica "entry")
+app.put('/api/odbaciEntry/:id_entry', authJwt.verifyTokenAdmin, function (request, response) {
+  const id_entry = request.params.id_entry;
+  connection.query('UPDATE entry SET status = "neaktivno" WHERE id_entry = ?', [id_entry], function (error, results) {
+    if (error) throw error;
+    response.send(results);
+  });
+});
+
+// Prelged/Dohvati zauzeća dvorane(tablica "entry")
 app.get("/api/entry/:id", (req, res) => {
   const { id } = req.params;
 
@@ -185,6 +203,39 @@ app.get("/api/entry/:id", (req, res) => {
       (error, results) => {
           if (error) throw error;
           res.send(results);
+      }
+  );
+});
+
+app.get("/api/entryOdobravanje", authJwt.verifyTokenAdminOrUser, (req, res) => {
+  const id_korisnika = req.query.id_korisnika;
+
+  connection.query(
+    `SELECT 
+      e.id_entry,
+      e.id_korisnik,
+      e.id_kolegij,
+      CONCAT(koris.ime, ' ', koris.prezime, ' (', koris.korisnicko_ime, ')') AS korisnicko_ime,
+      kole.naziv AS kolegij,
+      dvo.naziv AS dvorana,
+      e.start_date AS datum,
+      CONCAT(e.start_time, ' -  ', e.end_time) AS vrijeme,
+      e.svrha,
+      e.ponavljanje,
+      e.status
+    FROM entry e
+    INNER JOIN korisnici koris ON e.id_korisnik = koris.id_korisnik
+    INNER JOIN kolegij kole ON e.id_kolegij = kole.id_kolegija
+    INNER JOIN dvorane dvo ON e.id_dvorane = dvo.id_dvorane
+    WHERE status = 'zahtjev' OR status = 'Azuriran zahtjev';
+    `, [id_korisnika], (error, results) => {
+        if (error) throw error;
+        const formattedResults = results.map(result => ({
+          ...result,
+          datum: new Date(result.datum).toISOString().split('T')[0],
+          vrijeme: result.vrijeme.split(' - ').map(time => time.slice(0, 5)).join(' - ')
+        }));
+        res.send(formattedResults);
       }
   );
 });
