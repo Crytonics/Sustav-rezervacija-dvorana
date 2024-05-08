@@ -1,6 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import axios from 'axios';
+import { jwtDecode } from "jwt-decode";
 
 export default function OdobravanjeTerminaDvoranaAdministrator() {
+
+    const navigate = useNavigate();
     
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -24,6 +29,10 @@ export default function OdobravanjeTerminaDvoranaAdministrator() {
         program.razlog.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const dodaj_stisnuto = () => {
+        navigate("/UnosRezervacijaDvoranaAdministrator");
+    }
+
     return (
         <div className="dvorane_svi">
             <h1>
@@ -39,8 +48,8 @@ export default function OdobravanjeTerminaDvoranaAdministrator() {
                     onChange={handleSearchChange}
                     placeholder='Pretraži'
                 />
+                <button className="gumb_dodaj" onClick={dodaj_stisnuto}>Dodaj rezervaciju</button>
             </div>
-
             <table>
                 <thead>
                     <tr>
