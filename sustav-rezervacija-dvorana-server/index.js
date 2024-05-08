@@ -165,6 +165,16 @@ app.post('/api/unosEntry', authJwt.verifyTokenAdminOrUser, function (request, re
   });
 });
 
+// Unos entry (tablica "entry")
+app.post('/api/unosEntryAdmin', authJwt.verifyTokenAdmin, function (request, response) {
+  const data = request.body;
+  const entry = [[data.id_entry, "", data.svrha, data.status, data.pocetak_vrijeme, data.kraj_vrijeme, data.dvorana, data.korisnik, data.idKolegija, data.idStudijskiProgram, data.datum, data.datePonavljanje, data.ponavljanje]]
+  connection.query('INSERT INTO entry (id_entry, naziv, svrha, status, start_time, end_time, id_dvorane, id_korisnik, id_kolegij, id_studijskiProgrami, start_date, end_date, ponavljanje) VALUES ?', [entry], function (error, results, fields) {
+    if (error) throw error;
+    return response.send({ error: false, data: results, message: 'Korisnik je dodan.' });
+  });
+});
+
 // Prelged/Dohvati zauzeća dvorane (tablica "entry")
 app.get("/api/entry/:id", (req, res) => {
   const { id } = req.params;
@@ -251,6 +261,7 @@ app.get('/api/kolegiji', (req, res) => {
   const query = `
     SELECT 
       k.id_kolegija, 
+      k.id_studijskogPrograma,
       k.naziv AS naziv_kolegija, 
       CONCAT(kor.ime, ' ', kor.prezime, ' (', kor.korisnicko_ime, ')') AS korisnicko_ime, 
       sp.naziv AS naziv_studijskog_programa
