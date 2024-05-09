@@ -31,6 +31,20 @@ const connection = mysql.createConnection({
   database: "dlulic",
 });
 
+function formatTime(time) {
+  let parts = time.split(':');
+  // Ensure hours and minutes are correctly formatted
+  if (parts[0].length === 1) {
+      parts[0] = '0' + parts[0]; // Pad hour if necessary
+  }
+  if (parts.length > 1 && parts[1].length === 1) {
+      parts[1] = '0' + parts[1]; // Pad minute if necessary
+  } else if (parts.length === 1) {
+      parts.push('00'); // Add minutes if missing
+  }
+  return parts[0] + ':' + parts[1]; // Return formatted time
+}
+
 app.use(express.urlencoded({extended: true}));
 
 connection.connect();
@@ -168,7 +182,8 @@ app.post('/api/unosEntry', authJwt.verifyTokenAdminOrUser, function (request, re
 // Unos entry Administrator (tablica "entry")
 app.post('/api/unosEntryAdmin', authJwt.verifyTokenAdmin, function (request, response) {
   const data = request.body;
-  const entry = [[data.id_entry, "", data.svrha, data.status, data.pocetak_vrijeme, data.kraj_vrijeme, data.dvorana, data.korisnik, data.idKolegija, data.idStudijskiProgram, data.datum, data.datePonavljanje, data.ponavljanje]]
+  const endDate = data.datePonavljanje || null; // This will set endDate to null if datePonavljanje is undefined, empty, or false
+  const entry = [[data.id_entry, "", data.svrha, data.status, data.pocetak_vrijeme, data.kraj_vrijeme, data.dvorana, data.korisnik, data.idKolegija, data.idStudijskiProgram, data.datum, endDate, data.ponavljanje]]
   connection.query('INSERT INTO entry (id_entry, naziv, svrha, status, start_time, end_time, id_dvorane, id_korisnik, id_kolegij, id_studijskiProgrami, start_date, end_date, ponavljanje) VALUES ?', [entry], function (error, results, fields) {
     if (error) throw error;
     return response.send({ error: false, data: results, message: 'Korisnik je dodan.' });
@@ -207,7 +222,8 @@ app.get("/api/entry/:id", (req, res) => {
   );
 });
 
-app.get("/api/entryOdobravanje", authJwt.verifyTokenAdminOrUser, (req, res) => {
+// Pregled/Dohvati ogobravanje zahtjeva za rezervaciju dvorane (tablica "entry")
+app.get("/api/entryOdobravanje", authJwt.verifyTokenAdmin, (req, res) => {
   const id_korisnika = req.query.id_korisnika;
 
   connection.query(
@@ -233,7 +249,38 @@ app.get("/api/entryOdobravanje", authJwt.verifyTokenAdminOrUser, (req, res) => {
         const formattedResults = results.map(result => ({
           ...result,
           datum: new Date(result.datum).toISOString().split('T')[0],
-          vrijeme: result.vrijeme.split(' - ').map(time => time.slice(0, 5)).join(' - ')
+          vrijeme: result.vrijeme.split(' - ').map(time => formatTime(time)).join(' - ')
+        }));
+        res.send(formattedResults);
+      }
+  );
+});
+
+// Prelged/Dohvati rezervacija  dvorana (tablica "entry")
+app.get("/api/entryAdministrator", authJwt.verifyTokenAdmin, (req, res) => {
+  connection.query(
+    `SELECT 
+      e.id_entry,
+      e.id_korisnik,
+      e.id_kolegij,
+      CONCAT(koris.ime, ' ', koris.prezime, ' (', koris.korisnicko_ime, ')') AS korisnicko_ime,
+      kole.naziv AS kolegij,
+      dvo.naziv AS dvorana,
+      e.start_date AS datum,
+      CONCAT(e.start_time, ' -  ', e.end_time) AS vrijeme,
+      e.svrha,
+      e.ponavljanje,
+      e.status
+    FROM entry e
+    INNER JOIN korisnici koris ON e.id_korisnik = koris.id_korisnik
+    INNER JOIN kolegij kole ON e.id_kolegij = kole.id_kolegija
+    INNER JOIN dvorane dvo ON e.id_dvorane = dvo.id_dvorane;
+    `, (error, results) => {
+        if (error) throw error;
+        const formattedResults = results.map(result => ({
+          ...result,
+          datum: new Date(result.datum).toISOString().split('T')[0],
+          vrijeme: result.vrijeme.split(' - ').map(time => formatTime(time)).join(' - ')
         }));
         res.send(formattedResults);
       }
@@ -377,7 +424,7 @@ app.get("/api/entry_korisnik", authJwt.verifyTokenAdminOrUser, (req, res) => {
         const formattedResults = results.map(result => ({
           ...result,
           datum: new Date(result.datum).toISOString().split('T')[0],
-          vrijeme: result.vrijeme.split(' - ').map(time => time.slice(0, 5)).join(' - ')
+          vrijeme: result.vrijeme.split(' - ').map(time => formatTime(time)).join(' - ')
         }));
         res.send(formattedResults);
       }
@@ -385,13 +432,15 @@ app.get("/api/entry_korisnik", authJwt.verifyTokenAdminOrUser, (req, res) => {
 });
 
 // Prelged/Dohvati zauzeća dvorane pa id-u(tablica "entry")
-app.get("/api/entry_kolegij/:idKolegija", authJwt.verifyTokenAdminOrUser, (req, res) => {
-  const idKolegija = req.params.idKolegija;
+app.get("/api/entry_kolegij/:id_entry", authJwt.verifyTokenAdminOrUser, (req, res) => {
+  const id_entry = req.params.id_entry;
 
   connection.query(
     `SELECT 
       e.id_entry,
       e.id_kolegij,
+      e.id_korisnik,
+      CONCAT(koris.ime, ' ', koris.prezime) AS Korisnik_naziv,
       kole.naziv AS kolegij,
       dvo.naziv AS dvorana,
       e.start_date AS datum,
@@ -404,17 +453,18 @@ app.get("/api/entry_kolegij/:idKolegija", authJwt.verifyTokenAdminOrUser, (req, 
       e.ponavljanje,
       e.status
     FROM entry e
+    INNER JOIN korisnici koris ON e.id_korisnik = koris.id_korisnik
     INNER JOIN kolegij kole ON e.id_kolegij = kole.id_kolegija
     INNER JOIN dvorane dvo ON e.id_dvorane = dvo.id_dvorane
-    WHERE e.id_kolegij = ?;
-    `, [idKolegija], (error, results) => {
+    WHERE e.id_entry = ?;
+    `, [id_entry], (error, results) => {
         if (error) throw error;
         const formattedResults = results.map(result => ({
           ...result,
           datum: new Date(result.datum).toISOString().split('T')[0],
           start_time: result.start_time.slice(0, 5),
           end_time: result.end_time.slice(0, 5),
-          end_date: new Date(result.end_date).toISOString().split('T')[0]
+          end_date: result.end_date ? new Date(result.end_date).toISOString().split('T')[0] : null
         }));
         res.send(formattedResults);
       }
@@ -508,6 +558,17 @@ app.put('/api/onemoguciStudijskiProgram/:idStudProg', authJwt.verifyTokenAdmin, 
 app.put('/onemoguciRezervaciju', authJwt.verifyTokenAdmin, function (request, response) {
   const data = request.body;
   connection.query('UPDATE entry SET status = "0" WHERE id_entry = ?', [data.id_entry], function (error, results, fields) {
+    if (error) throw error;
+    console.log('data', data)
+    return response.send({ error: false, data: results, message: 'Rezervacija je onemogućena.' });
+  });
+});
+
+// Izbriši rezervacija (tablica "entry")
+app.delete('/api/izbrisiRezervaciju/:id_entry', authJwt.verifyTokenAdmin, function (request, response) {
+  const data = request.body;
+  const id_entry = request.params.id_entry;
+  connection.query('DELETE FROM entry WHERE id_entry = ?', [id_entry], function (error, results, fields) {
     if (error) throw error;
     console.log('data', data)
     return response.send({ error: false, data: results, message: 'Rezervacija je onemogućena.' });
@@ -611,6 +672,8 @@ app.put('/api/azuriranjeEntry/:id_entry', authJwt.verifyTokenAdminOrUser, functi
   const id_entry = request.params.id_entry;
   const data = request.body;
 
+  const endDate = data.date_ponavljanje || null;
+
   const sqlQuery = `
     UPDATE entry 
     SET 
@@ -634,10 +697,10 @@ app.put('/api/azuriranjeEntry/:id_entry', authJwt.verifyTokenAdminOrUser, functi
     data.kraj_vrijeme, 
     data.idDvorane, 
     data.id_korisnika, 
-    data.id_kolegija, 
+    data.idKolegija, 
     data.idStudijskiProgram, 
     data.datum, 
-    data.date_ponavljanje, 
+    data.endDate, 
     data.ponavljanje,
     id_entry
   ];
