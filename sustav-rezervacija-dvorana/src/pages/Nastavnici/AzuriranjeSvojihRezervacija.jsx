@@ -44,7 +44,7 @@ export default function AzuriranjeSvojihRezervacija() {
         return true;
     };
 
-    const { idKolegija } = useParams()
+    const { id_entry } = useParams()
 
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -58,13 +58,14 @@ export default function AzuriranjeSvojihRezervacija() {
     const [datum, setDatum] = useState('');
     const [end_date, setEnd_date] = useState('');
     const [svrha, setSvrha] = useState('');
-    const [id_entry, setId_entry] = useState([]);
+    //const [id_entry, setId_entry] = useState([]);
 
     const [isToggled, setIsToggled] = useState(false);
 
     const filteredKolegiji = kolegiji.filter(kolegij =>
         kolegij.naziv_kolegija.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        kolegij.id_studijskogPrograma.toLowerCase().includes(searchTerm.toLowerCase())
+        kolegij.id_studijskogPrograma.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        kolegij.id_kolegija.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const filteredDvorane = dvorane.filter(dvorana =>
@@ -161,14 +162,17 @@ export default function AzuriranjeSvojihRezervacija() {
             const response3 = await axios.get(`http://localhost:3000/api/rezervacije`, { headers });
             setEntry(response3.data);
 
-            const response4 = await axios.get(`http://localhost:3000/api/entry_kolegij/${idKolegija}`, { headers });
+            const response4 = await axios.get(`http://localhost:3000/api/entry_kolegij/${id_entry}`, { headers });
             setEntry_kolegij(response4.data);
+            console.log("Entry_kolegij: ", response2.data);
+            console.log("Entry_id_kolegij: ", response4.data[0].id_kolegij);
+            console.log("Entry_naziv_kolegij: ", response4.data[0].kolegij);
 
             if (response4.data.length > 0) {
                 setDatum(response4.data[0].datum);
                 setEnd_date(response4.data[0].end_date);
                 setSvrha(response4.data[0].svrha);
-                setId_entry(response4.data[0].id_entry);
+                //setId_entry(response4.data[0].id_entry);
             }
 
         } catch (error) {
@@ -180,18 +184,18 @@ export default function AzuriranjeSvojihRezervacija() {
         event.preventDefault(); // Prevent the default form submission behavior
         const kolegij = event.target.Kolegiji.value;
         const [idKolegija, idStudijskiProgram] = kolegij.split(',');
-        const selectedValue = event.target.Dvorane.value;
-        const [dvorana, idDvorane] = selectedValue.split(',')
+        const idDvorane = event.target.Dvorane.value;
         const svrha = event.target.svrha.value;
         const datum = event.target.Datum.value;
         const pocetak_vrijeme = event.target.Pocetak.value;
         const kraj_vrijeme = event.target.Kraj.value;
         const date_ponavljanje = event.target.date_ponavljanje.value;
         const status = "Azuriran zahtjev"
-        const id_kolegija = filteredEntry_kolegij.length > 0 ? filteredEntry_kolegij[0].id_kolegij : null;
 
-        const userData = { id_entry, status, svrha, pocetak_vrijeme, kraj_vrijeme, idDvorane, id_korisnika, id_kolegija, idStudijskiProgram, datum, date_ponavljanje, ponavljanje };
+        const userData = { id_entry, status, svrha, pocetak_vrijeme, kraj_vrijeme, idDvorane, id_korisnika, idKolegija, idStudijskiProgram, datum, date_ponavljanje, ponavljanje };
 
+
+        console.log("USER DATA: ", userData);
         posalji_podatke(userData);
     }
 
@@ -214,10 +218,10 @@ export default function AzuriranjeSvojihRezervacija() {
             <div className="form-group">
                 <label htmlFor="Kolegiji">Kolegij: </label>
                 <select id="Kolegiji" name="Kolegiji" required>
-                <option value={filteredEntry_kolegij.length > 0 ? `${filteredEntry_kolegij[0].kolegij},${filteredEntry_kolegij[0].id_studijskiProgrami}` : ""}>
-                        {filteredKolegiji.length > 0 ? filteredKolegiji[0].naziv_kolegija : "Nema dostupnih kolegija"}
+                <option value={filteredEntry_kolegij.length > 0 ? `${filteredEntry_kolegij[0].id_kolegij},${filteredEntry_kolegij[0].id_studijskiProgrami}` : ""}>
+                        {filteredEntry_kolegij.length > 0 ? filteredEntry_kolegij[0].kolegij : "Nema dostupnih kolegija"}
                     </option>
-                    {filteredKolegiji.slice(1).map((kolegij) => (
+                    {filteredKolegiji.slice(0).map((kolegij) => (
                         <option key={kolegij.id_kolegija} value={`${kolegij.id_kolegija},${kolegij.id_studijskogPrograma}`}>
                             {kolegij.naziv_kolegija}
                         </option>
@@ -227,7 +231,7 @@ export default function AzuriranjeSvojihRezervacija() {
             <div className="form-group">
                 <label htmlFor="Dvorane">Dvorana: </label>
                 <select id="Dvorane" name="Dvorane" required>
-                <option value={filteredEntry_kolegij.length > 0 ? `${filteredEntry_kolegij[0].dvorana},${filteredEntry_kolegij[0].id_dvorane}` : ""}>
+                <option value={filteredEntry_kolegij.length > 0 ? filteredEntry_kolegij[0].id_dvorane : ""}>
                     {filteredEntry_kolegij.length > 0 ? filteredEntry_kolegij[0].dvorana : ""}
                     </option>
                     {filteredDvorane.slice(1).map((dvorana) => (
