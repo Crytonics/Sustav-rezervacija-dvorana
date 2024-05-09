@@ -292,6 +292,69 @@ input:checked + .slider:before {
   background-color: #0056b3;
 }
 
+.unos-rezervacija-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60vh; /* This makes sure that the container takes full viewport height */
+}
+
+.unos-rezervacija-container .login-form {
+  margin-top: 10%;
+  padding: 10%;
+  background-color: #3b3939; /* Background color for the form itself */
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow around the form */
+}
+
+.unos-rezervacija-container .form-group {
+  margin-bottom: 15px;
+}
+
+.unos-rezervacija-container .form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.unos-rezervacija-container .form-group input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.unos-rezervacija-container .form-group select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.unos-rezervacija-container button[type="submit"] {
+  margin-left: 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.unos-rezervacija-container button[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+.unos-rezervacija-container button[type="button"] {
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.unos-rezervacija-container button[type="button"]:hover {
+  background-color: rgb(122, 0, 0);
+}
+
 /* Unos korisnika */
 .unos-korisnika-container {
   display: flex;

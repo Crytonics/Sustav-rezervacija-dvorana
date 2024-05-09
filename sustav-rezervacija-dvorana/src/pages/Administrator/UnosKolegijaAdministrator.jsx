@@ -1,8 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import axios from 'axios';
+import { jwtDecode } from "jwt-decode";
 
 export default function UnosKolegijaAdministrator() {
+
+    const decodeToken = (token) => {
+        try {
+            const decoded = jwtDecode(token);
+            return decoded.uloga;
+        } catch (error) {
+            console.error("Error decoding token:", error);
+            return null;
+        }
+    };
+
+    const isAdmin = (token, headers) => {
+        if (!token) {
+            navigate('/odbijenPristup');
+            return false;
+        }
+    
+        const role = decodeToken(token);
+        if (role !== "admin") {
+            navigate('/odbijenPristup');
+            return false;
+        }
+    
+        dohvatiPodatke(headers);
+        return true;
+    };
 
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -17,23 +44,28 @@ export default function UnosKolegijaAdministrator() {
             const token = localStorage.getItem("token");
         
             // Set up the request headers to include the JWT token
-            const headers = { Authorization: `Bearer ${token}` }; 
-
-            try {
-                const response = await axios.get(`http://localhost:3000/api/korisnici`, { headers });
-                setKorisnici(response.data);
-
-                const response1 = await axios.get(`http://localhost:3000/api/studijskiProgrami`, { headers });
-                setStudenskiProgrami(response1.data);
-              
-            } catch (error) {
-                console.log("Greška prilikom dohvata podataka:", error);
-            } 
+            const headers = { Authorization: `Bearer ${token}` };
             
+            decodeToken(token);
+
+            isAdmin(token, headers);
         }
 
         fetchInitialData();
     }, []);
+
+    const dohvatiPodatke = async (headers) => {
+        try {
+            const response = await axios.get(`http://localhost:3000/api/korisnici`, { headers });
+            setKorisnici(response.data);
+
+            const response1 = await axios.get(`http://localhost:3000/api/studijskiProgrami`, { headers });
+            setStudenskiProgrami(response1.data);
+          
+        } catch (error) {
+            console.log("Greška prilikom dohvata podataka:", error);
+        } 
+    }
 
     const filteredKorisnici = korisnici.filter(korisnik =>
         korisnik.ime.toLowerCase().includes(searchTerm.toLowerCase()) ||

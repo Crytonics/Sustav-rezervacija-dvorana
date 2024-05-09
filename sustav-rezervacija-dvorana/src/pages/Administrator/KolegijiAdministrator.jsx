@@ -1,8 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import axios from 'axios';
+import { jwtDecode } from "jwt-decode";
 
 export default function KolegijiAdministrator() {
+
+    const decodeToken = (token) => {
+        try {
+            const decoded = jwtDecode(token);
+            return decoded.uloga;
+        } catch (error) {
+            console.error("Error decoding token:", error);
+            return null;
+        }
+    };
+
+    const isAdmin = (token, headers) => {
+        if (!token) {
+            navigate('/odbijenPristup');
+            return false;
+        }
+    
+        const role = decodeToken(token);
+        if (role !== "admin") {
+            navigate('/odbijenPristup');
+            return false;
+        }
+    
+        dohvatiKolegija(headers);
+        return true;
+    };
 
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -51,7 +78,7 @@ export default function KolegijiAdministrator() {
     );
 
     const filteredStupci = stupci.filter(stupc =>
-        stupc.name.toLowerCase().includes(searchTerm.toLowerCase())
+        stupc.name.toLowerCase()
     );
 
     const navigate = useNavigate();
@@ -76,7 +103,9 @@ export default function KolegijiAdministrator() {
             // Set up the request headers to include the JWT token
             const headers = { Authorization: `Bearer ${token}` };
 
-            dohvatiKolegija(headers);
+            decodeToken(token);
+
+            isAdmin(token, headers);
         }
 
         fetchInitialData();
@@ -86,7 +115,6 @@ export default function KolegijiAdministrator() {
         try {
             const response = await axios.get("http://localhost:3000/api/kolegiji", {headers});
             setKolegiji(response.data);
-            console.log("DATA:", response.data);
         } catch (error) {
             console.log("Greška prilikom dohvata korisnika:", error);
         } 

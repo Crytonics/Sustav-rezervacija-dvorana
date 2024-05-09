@@ -1,8 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, Outlet, useNavigate, useParams } from "react-router-dom";
 import axios from 'axios';
+import { jwtDecode } from "jwt-decode";
 
 export default function AzuriranjeStudijskihProgramaAdministrator() {
+
+    const decodeToken = (token) => {
+        try {
+            const decoded = jwtDecode(token);
+            return decoded.uloga;
+        } catch (error) {
+            console.error("Error decoding token:", error);
+            return null;
+        }
+    };
+
+    const isAdmin = (token, headers) => {
+        if (!token) {
+            navigate('/odbijenPristup');
+            return false;
+        }
+    
+        const role = decodeToken(token);
+        if (role !== "admin") {
+            navigate('/odbijenPristup');
+            return false;
+        }
+    
+        dohvatiPodatke(headers);
+        return true;
+    };
 
     const navigate = useNavigate();
 
@@ -13,12 +40,17 @@ export default function AzuriranjeStudijskihProgramaAdministrator() {
     }
 
     const [studenskiProgrami, setStudenskiProgrami] = useState([]);
+    const [naziv, setNaziv] = useState([]);
 
     const { idStudProg } = useParams()
 
     const filteredStudenskiProgrami = studenskiProgrami.filter(studprog =>
         studprog.naziv.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    const handleNazivChange = (event) => {
+        setNaziv(event.target.value);
+    };
 
     useEffect(() => {
         async function fetchInitialData() {
@@ -29,20 +61,26 @@ export default function AzuriranjeStudijskihProgramaAdministrator() {
             // Set up the request headers to include the JWT token
             const headers = { Authorization: `Bearer ${token}` }; 
 
-            try {
-                const response = await axios.get(`http://localhost:3000/api/pojed_studijskiProgrami/${idStudProg}`, { headers });
-                setStudenskiProgrami(response.data);
-              
-                
-                
-            } catch (error) {
-                console.log("Greška prilikom dohvata studijskog programa:", error);
-            } 
-            
+            decodeToken(token);
+
+            isAdmin(token, headers);
         }
 
         fetchInitialData();
     }, []);
+
+    const dohvatiPodatke = async (headers) => {
+        try {
+            const response = await axios.get(`http://localhost:3000/api/pojed_studijskiProgrami/${idStudProg}`, { headers });
+            setStudenskiProgrami(response.data);
+            if (response.data.length > 0) {
+                setNaziv(response.data[0].naziv);
+            }
+            
+        } catch (error) {
+            console.log("Greška prilikom dohvata studijskog programa:", error);
+        } 
+    }
 
     const spremi_podatke = (event) => {
         event.preventDefault(); // Prevent the default form submission behavior
@@ -71,7 +109,7 @@ export default function AzuriranjeStudijskihProgramaAdministrator() {
         <form className="login-form" onSubmit={spremi_podatke}>
             <div className="form-group">
                 <label htmlFor="naziv">Naziv studija: </label>
-                <input type="text" id="naziv" name="naziv" placeholder={filteredStudenskiProgrami.length > 0 ? filteredStudenskiProgrami[0].naziv : 'Unesite ime'} required />
+                <input type="text" id="naziv" name="naziv" value={naziv} onChange={handleNazivChange} required />
             </div>
             <button type="button" onClick={natrak_stisnuto}>Natrag</button>
             <button type="submit">Spremi</button>

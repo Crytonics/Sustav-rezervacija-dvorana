@@ -8,8 +8,10 @@ export default function Pocetna() {
     
     const currentMonth = currentDate.getMonth();
     const currentYear = currentDate.getFullYear();
+    const currentMonth2 = realCurrentDate.getMonth();
+    const currentYear2 = realCurrentDate.getFullYear();
     const today = realCurrentDate.getDate();
-    const day = currentDate.getDay();
+    const day = realCurrentDate.getDay();
   
     const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
     const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
@@ -85,7 +87,7 @@ export default function Pocetna() {
   
     return (
         <>
-        <p className="datum_pocetna">{daysOfWeek[adjustedDayOfWeekIndex]} {today} {monthNames[currentMonth]} {currentYear}</p>
+        <p className="datum_pocetna">{daysOfWeek[adjustedDayOfWeekIndex]} {today} {monthNames[currentMonth2]} {currentYear2}</p>
         <div className="calendar-navigation">
             <button onClick={goToPreviousMonth}>Previous</button>
             <p className="p_pocetna">{monthNames[currentMonth]} {currentYear}</p>

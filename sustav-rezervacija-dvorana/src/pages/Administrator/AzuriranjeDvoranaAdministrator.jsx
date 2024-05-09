@@ -1,14 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import axios from 'axios';
+import { jwtDecode } from "jwt-decode";
 
 export default function AzuriranjeDvorane() {
+
+    const decodeToken = (token) => {
+        try {
+            const decoded = jwtDecode(token);
+            return decoded.uloga;
+        } catch (error) {
+            console.error("Error decoding token:", error);
+            return null;
+        }
+    };
+
+    const isAdmin = (token, headers) => {
+        if (!token) {
+            navigate('/odbijenPristup');
+            return false;
+        }
+    
+        const role = decodeToken(token);
+        if (role !== "admin") {
+            navigate('/odbijenPristup');
+            return false;
+        }
+    
+        dohvatiPodatke(headers);
+        return true;
+    };
 
     const navigate = useNavigate();
 
     const [searchTerm, setSearchTerm] = useState('');
 
     const [dvorane, setDvorane] = useState([]);
+    const [naziv, setNaziv] = useState([]);
 
     const natrak_stisnuto = () => {
         navigate("/dvoraneAdministrator");
@@ -21,25 +49,34 @@ export default function AzuriranjeDvorane() {
         dvorane.svrha.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-
-
+    const handleNazivChange = (event) => {
+        setNaziv(event.target.value);
+    };
 
     useEffect(() => {
         async function fetchInitialData() {
             const token = localStorage.getItem("token");
             const headers = { Authorization: `Bearer ${token}` }; 
 
-            try {
-                const response = await axios.get(`http://localhost:3000/api/pojed_dvorane/${id_dvorane}`, { headers });
-                setDvorane(response.data);
-            } catch (error) {
-                console.log("Greška prilikom dohvata podataka:", error);
-            }
-            console.log(id_dvorane);
+            decodeToken(token);
+
+            isAdmin(token, headers);
         }
 
         fetchInitialData();
     }, []);
+
+    const dohvatiPodatke = async (headers) => {
+        try {
+            const response = await axios.get(`http://localhost:3000/api/pojed_dvorane/${id_dvorane}`, { headers });
+            setDvorane(response.data);
+            if (response.data.length > 0) {
+                setNaziv(response.data[0].naziv);
+            }
+        } catch (error) {
+            console.log("Greška prilikom dohvata podataka:", error);
+        }
+    }
 
     const spremi_podatke = (event) => {
         event.preventDefault();
@@ -70,7 +107,7 @@ export default function AzuriranjeDvorane() {
         <form className="login-form" onSubmit={spremi_podatke}>
             <div className="form-group">
                 <label htmlFor="naziv">Naziv dvorane: </label>
-                <input type="text" id="naziv" name="naziv" placeholder={filteredDvorane.length > 0 ? filteredDvorane[0].naziv : 'Unesite ime'} required />
+                <input type="text" id="naziv" name="naziv" value={naziv} onChange={handleNazivChange} required />
             </div>
             <div className="form-group">
                 <label htmlFor="svrha">Uloga: </label>
