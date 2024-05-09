@@ -54,7 +54,7 @@ export default function UnosRezervacijaDvoranaAdministrator() {
     const [ponavljanje, setPonavljanje] = useState([]);
     const [id_korisnika, setId_korisnika] = useState([]);
     const [korisnici, setKorisnici] = useState([]);
-    const [datePonavljanje, setDatePonavljanje] = useState('0000-00-00');
+    const [datePonavljanje, setDatePonavljanje] = useState('');
 
     const [isToggled, setIsToggled] = useState(false);
 
