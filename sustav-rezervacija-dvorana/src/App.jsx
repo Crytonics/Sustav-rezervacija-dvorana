@@ -46,7 +46,7 @@ function App() {
           <Route path="prijava" element={<Prijava />} />
           <Route path="/pojedineDvoraneSvi/:id_dvorane" element={<PojedineDvoraneSvi />} />
           <Route path="pojediniKolegijiSvi" element={<PojediniKolegijiSvi />} />
-          <Route path="/PojediniKolegijiSvi/:idKolegija" element={<PojediniKolegijiSvi />} />
+          <Route path="/PojediniKolegijiSvi/:id_entry" element={<PojediniKolegijiSvi />} />
           <Route path="pojediniKolegijiPoStudijimaSvi" element={<PojediniKolegijiPoStudijimaSvi />} />
           <Route path="/PojediniKolegijiPoStudijimaSvi/:idStudProg" element={<PojediniKolegijiPoStudijimaSvi />} />
           <Route path="dvoraneSvi" element={<DvoraneSvi />} />
@@ -56,14 +56,14 @@ function App() {
           <Route path="zatraziRezervacijuNastavnici" element={<ZatraziRezervacijuNastavnici />} />
           <Route path="pregledSvojihRezervacijaNastavnici" element={<PregledSvojihRezervacijaNastavnici />} />
           <Route path="pregledSvojihKolegijaNastavnici" element={<PregledSvojihKolegijaNastavnici />} />
-          <Route path="/AzuriranjeSvojihRezervacija/:idKolegija" element={<AzuriranjeSvojihRezervacija />} />
+          <Route path="/AzuriranjeSvojihRezervacija/:id_entry" element={<AzuriranjeSvojihRezervacija />} />
 
           <Route path="listaKorisnikaAdministrator" element={<ListaKorisnikaAdministrator />} />
           <Route path="unosKorisnikaAdministrator" element={<UnosKorisnikaAdministrator />} />
           <Route path="/AzuriranjeKorisnikaAdministrator/:idKorisnika" element={<AzuriranjeKorisnikaAdministrator />} />
           <Route path="pregledRezervacijaDvoranaAdministrator" element={<PregledRezervacijaDvoranaAdministrator />} />
           <Route path="unosRezervacijaDvoranaAdministrator" element={<UnosRezervacijaDvoranaAdministrator />} />
-          <Route path="azuriranjeRezervacijaDvoranaAdministrator" element={<AzuriranjeRezervacijaDvoranaAdministrator />} />
+          <Route path="/AzuriranjeRezervacijaDvoranaAdministrator/:id_entry" element={<AzuriranjeRezervacijaDvoranaAdministrator />} />
           <Route path="dvoraneAdministrator" element={<DvoraneAdministrator />} />
           <Route path="kolegijiAdministrator" element={<KolegijiAdministrator />} />
           <Route path="unosKolegijaAdministrator" element={<UnosKolegijaAdministrator />} />
