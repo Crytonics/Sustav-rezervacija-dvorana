@@ -132,12 +132,12 @@ export default function PregledSvojihRezervacijaNastavnici() {
 
     const navigate = useNavigate();
 
-    const vidi_stisnuto = (idKolegija) => {
-        navigate(`/pojediniKolegijiSvi/${idKolegija}`);
+    const vidi_stisnuto = (id_entry) => {
+        navigate(`/pojediniKolegijiSvi/${id_entry}`);
     }
 
-    const uredi_stisnuto = async (idKolegija) => {
-        navigate(`/AzuriranjeSvojihRezervacija/${idKolegija}`);
+    const uredi_stisnuto = async (id_entry) => {
+        navigate(`/AzuriranjeSvojihRezervacija/${id_entry}`);
     }
 
     useEffect(() => {
@@ -212,8 +212,8 @@ export default function PregledSvojihRezervacijaNastavnici() {
                             <td>{zahtjev.ponavljanje }</td>
                             <td>{zahtjev.status }</td>
                             <td>
-                            <button className="gumb_vidi" onClick={() => vidi_stisnuto(zahtjev.id_kolegij)}>Vidi</button>
-                            <button className="gumb_uredi" onClick={() => uredi_stisnuto(zahtjev.id_kolegij)}>Uredi</button>
+                            <button className="gumb_vidi" onClick={() => vidi_stisnuto(zahtjev.id_entry)}>Vidi</button>
+                            <button className="gumb_uredi" onClick={() => uredi_stisnuto(zahtjev.id_entry)}>Uredi</button>
                             </td>
                         </tr>
                     ))}
