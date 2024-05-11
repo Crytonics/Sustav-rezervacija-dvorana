@@ -378,6 +378,31 @@ app.get('/api/kolegiji', (req, res) => {
   });
 });
 
+// Pregled/Dohvati kolegiji po studijskom programu (tablica "kolegij")
+app.get('/api/kolegiji_studijskiProgrami/:idStudProg', (req, res) => {
+  const idStudProg = req.params.idStudProg;
+  const query = `
+    SELECT 
+      k.id_kolegija, 
+      k.id_studijskogPrograma,
+      k.naziv AS naziv_kolegija, 
+      CONCAT(kor.ime, ' ', kor.prezime, ' (', kor.korisnicko_ime, ')') AS korisnicko_ime, 
+      sp.naziv AS naziv_studijskog_programa
+    FROM kolegij k
+    INNER JOIN korisnici kor ON k.id_korisnik = kor.id_korisnik
+    INNER JOIN studijskiProgrami sp ON k.id_studijskogPrograma = sp.id_studijskogPrograma
+    WHERE k.aktivan = '1' AND kor.aktivan = '1' AND sp.aktivan = '1' AND k.id_studijskogPrograma = ?;
+  `;
+
+  connection.query(query, [idStudProg], (error, results) => {
+    if (error) {
+      console.error("Error fetching data:", error);
+      return res.status(500).json({ error: true, message: "Error fetching data from database." });
+    }
+    res.send(results);
+  });
+});
+
 // Pregled/Dohvati kolegiji po korisniku(tablica "kolegij")
 app.get('/api/pojed_kolegiji', authJwt.verifyTokenAdminOrUser, (req, res) => {
   const id_korisnika = req.query.id_korisnika;
