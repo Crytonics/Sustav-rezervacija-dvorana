@@ -1,28 +1,63 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 export default function StudijskiProgramiSvi() {
 
     const [searchTerm, setSearchTerm] = useState('');
 
-    const [programs, setPrograms] = useState([
-        { id: 1, naziv: 'Informatika' },
-        { id: 2, naziv: 'Telematika' },
-        { id: 3, naziv: 'Promet' },
+    const [studenskiProgrami, setStudenskiProgrami] = useState([]);
+
+    const [stupci, setStupci] = useState([
+        {
+            name: "naziv",
+            required: true,
+            label: "Naziv",
+            align: "left",
+            field: "naziv",
+            sortable: true,
+        },
+        {
+            name: "funkcije",
+            label: "Funkcije",
+            align: "center",
+        }
     ]);
 
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value);
     };
 
-    const filteredPrograms = programs.filter(program =>
-        program.naziv.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredStudenskiProgrami = studenskiProgrami.filter(studprog =>
+        studprog.naziv.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const filteredStupci = stupci.filter(stupc =>
+        stupc.name.toLowerCase()
     );
 
     const navigate = useNavigate();
 
-    const vidi_stisnuto = () => {
-        navigate("/pojediniKolegijiPoStudijimaSvi");
+    const vidi_stisnuto = (idStudProg) => {
+        navigate(`/pojediniKolegijiPoStudijimaSvi/${idStudProg}`);
+    }
+
+    useEffect(() => {
+        async function fetchInitialData() {
+
+            dohvatiStudijskePrograme();
+        }
+
+        fetchInitialData();
+    }, []);
+
+    const dohvatiStudijskePrograme = async () => {
+        try {
+            const response = await axios.get("http://localhost:3000/api/studijskiProgrami");
+            setStudenskiProgrami(response.data);
+        } catch (error) {
+            console.log("Greška prilikom dohvata studijskih programa:", error);
+        }
     }
 
     return (
@@ -45,16 +80,19 @@ export default function StudijskiProgramiSvi() {
             <table>
                 <thead>
                     <tr>
-                        <th>Naziv</th>
-                        <th>Funkcije</th>
+                        {filteredStupci.length > 0 && 
+                        filteredStupci.map(stupc => (
+                            <th key={stupc.label}>{stupc.label}</th>
+                        ))}
                     </tr>
                 </thead>
                 <tbody>
-                    {filteredPrograms.map((program) => (
-                        <tr key={program.id}>
-                            <td>{program.naziv}</td>
+                    {filteredStudenskiProgrami.map((studprog, index) => (
+                        <tr key={index}>
+                            <td>{studprog.naziv}</td>
+                            
                             <td>
-                                <button className="gumb_vidi" onClick={vidi_stisnuto}>Vidi</button>
+                                <button className="gumb_vidi" onClick={() => vidi_stisnuto(studprog.id_studijskogPrograma)}>Vidi</button>
                             </td>
                         </tr>
                     ))}
