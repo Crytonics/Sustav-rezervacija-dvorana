@@ -1,6 +1,5 @@
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
-import "../../css/pojedineDvorane.css"
 
 export default function PojedineDvoraneSvi() {
 
