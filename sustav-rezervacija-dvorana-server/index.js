@@ -209,15 +209,42 @@ app.put('/api/odbaciEntry/:id_entry', authJwt.verifyTokenAdmin, function (reques
 });
 
 // Prelged/Dohvati zauzeća dvorane(tablica "entry")
-app.get("/api/entry/:id", (req, res) => {
-  const { id } = req.params;
+app.get("/api/entry/:joinedDate", (req, res) => {
+  const { joinedDate } = req.params;
 
   connection.query(
-      "SELECT id_entry, naziv, tip, opis, status, start_time, end_time, id_dvorane, id_korisnik, id_kolegij, id_studijskiProgrami WHERE id_dvorane = ? AND status = 'aktivan'",
-      [id],
-      (error, results) => {
+        `SELECT
+        e.id_entry,
+        e.id_korisnik,
+        CONCAT(koris.ime, ' ', koris.prezime) AS korisnicko_ime,
+        kole.naziv AS kolegij_naziv,
+        stud.naziv AS studijski_program_naziv,
+        e.id_kolegij,
+        e.id_dvorane,
+        e.start_date,
+        e.end_date,
+        e.start_time,
+        e.end_time,
+        e.status,
+        e.svrha,
+        e.naziv,
+        e.ponavljanje,
+        e.id_studijskiProgrami
+      FROM entry e
+      INNER JOIN korisnici koris ON e.id_korisnik = koris.id_korisnik
+      INNER JOIN kolegij kole ON e.id_kolegij = kole.id_kolegija
+      INNER JOIN studijskiProgrami stud ON e.id_studijskiProgrami = stud.id_studijskogPrograma
+      WHERE e.status = 'aktivno' AND e.start_date <= ? AND e.end_date >= ?`,
+      [joinedDate, joinedDate], (error, results) => {
           if (error) throw error;
-          res.send(results);
+          const formattedResults = results.map(result => ({
+            ...result,
+            start_date: new Date(result.start_date).toISOString().split('T')[0],
+            end_date: result.end_date ? new Date(result.end_date).toISOString().split('T')[0] : null,
+            start_time: formatTime(result.start_time),
+            end_time: formatTime(result.end_time)
+          }));
+          res.send(formattedResults);
       }
   );
 });
