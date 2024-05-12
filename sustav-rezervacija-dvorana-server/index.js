@@ -133,8 +133,8 @@ app.post('/api/unosKorisnika', authJwt.verifyTokenAdmin, function (request, resp
 // Unos novog studijskog programa (tablica "studijskiProgrami")
 app.post('/api/unosStudijskogPrograma', authJwt.verifyTokenAdmin, function (request, response) {
   const data = request.body;
-  const studijskiprogram = [[data.id_StudijskogPrograma, data.naziv_studija, "1"]]
-  connection.query('INSERT INTO studijskiProgrami (id_StudijskogPrograma, naziv, aktivan) VALUES ?',
+  const studijskiprogram = [[data.id_StudijskogPrograma, data.naziv_studija, data.backgroundColor, "1"]]
+  connection.query('INSERT INTO studijskiProgrami (id_StudijskogPrograma, naziv, boja, aktivan) VALUES ?',
   [studijskiprogram], function (error, results, fields) {
     if (error) throw error;
     return response.send({ error: false, data: results, message: 'Studijski program je dodan.' });
@@ -219,6 +219,7 @@ app.get("/api/entry/:joinedDate", (req, res) => {
         CONCAT(koris.ime, ' ', koris.prezime) AS korisnicko_ime,
         kole.naziv AS kolegij_naziv,
         stud.naziv AS studijski_program_naziv,
+        stud.boja AS boja_studijskog_programa,
         e.id_kolegij,
         e.id_dvorane,
         e.start_date,

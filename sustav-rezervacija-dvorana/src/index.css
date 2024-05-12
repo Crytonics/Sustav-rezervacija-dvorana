@@ -434,3 +434,16 @@ input:checked + .slider:before {
 .dvorane_svi button {
   margin-right: 10px;
 }
+
+.unos-korisnika-container .login-form .pick-color-button {
+  display: flex;
+  background-color: #0004ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
+
+.unos-korisnika-container .login-form .pick-color-button:hover {
+  background-color: #00026b;
+}
+
