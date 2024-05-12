@@ -13,20 +13,16 @@ function Pocetna() {
 
     const { datum } = useParams();
     const datumDate = datum ? new Date(datum) : new Date(); // Convert datum to a Date object or use today's date as default
-    console.log(datumDate);
 
     const dayOfWeekIndex = datumDate.getDay(); // Get day of the week index (0-6)
     const dayName = daysOfWeek_puni[(dayOfWeekIndex === 0 ? 6 : dayOfWeekIndex - 1)]; // Adjust for week starting on Monday
     const dayOfMonth = datumDate.getDate(); // Get day of the month (1-31)
     const monthIndex = datumDate.getMonth(); // Get month index (0-11)
     const year = datumDate.getFullYear(); // Get full year (e.g., 2023)
-    console.log(year);
-    console.log(monthIndex + 1);
-    console.log(dayOfMonth);
-    console.log(dayName);
 
     const [entries, setEntries] = useState([]);
     const [dvorane, setDvorane] = useState([]);
+    const [test, setTest] = useState([]);
 
     const realCurrentDate = new Date(); // This remains constant, representing the real-world current date
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -58,6 +54,7 @@ function Pocetna() {
     
     const openPocetna = (joinedDate1) => {
         // Navigate to a new page, passing the day as a parameter
+        setTest(joinedDate1);
         navigate(`/pocetna/${joinedDate1}`);
         //window.location.reload();
     };
@@ -67,7 +64,6 @@ function Pocetna() {
         fetch("http://localhost:3000/api/dvorane")
             .then(response => response.json())
             .then(data => {
-                console.log("Fetched dvorane data:", data); // Check the fetched data
                 setDvorane(data);
             })
             .catch(error => console.error('Error fetching dvorane:', error));
@@ -82,7 +78,6 @@ function Pocetna() {
             fetch(`http://localhost:3000/api/entry/${datum}`)
                 .then(response => response.json())
                 .then(data => {
-                    console.log("Fetched data:", data); // Initial data
                     const timeSlots = generateTimeSlots();
                     // Assuming data contains an array of objects with start_time and end_time
                     data.forEach(entry => {
@@ -93,25 +88,38 @@ function Pocetna() {
                         entry.startSlot = calculateStartSlot(entry.start_time, timeSlots); // Assuming timeSlots is accessible hereme slots
 
                         timeSlots.forEach(slot => {
-                            const slotHours = parseInt(slot.time.substring(0, 2));
-                            const slotMinutes = parseInt(slot.time.substring(3, 5));
-                            const slotTimeString = `${slotHours.toString().padStart(2, '0')}:${slotMinutes.toString().padStart(2, '0')}`;
+                            if (entry.ponavljanje === 0) {
+                                const slotHours = parseInt(slot.time.substring(0, 2));
+                                const slotMinutes = parseInt(slot.time.substring(3, 5));
+                                const slotTimeString = `${slotHours.toString().padStart(2, '0')}:${slotMinutes.toString().padStart(2, '0')}`;
 
-                            if (slotTimeString >= entryStartTime && slotTimeString < entryEndTime) {
-                                if (!slot.entries[entryDvoranaId]) {
-                                    slot.entries[entryDvoranaId] = [];
+                                if (slotTimeString >= entryStartTime && slotTimeString < entryEndTime) {
+                                    if (!slot.entries[entryDvoranaId]) {
+                                        slot.entries[entryDvoranaId] = [];
+                                    }
+                                    slot.entries[entryDvoranaId].push(entry);
                                 }
-                                slot.entries[entryDvoranaId].push(entry);
+                            } else {
+                                const slotHours = parseInt(slot.time.substring(0, 2));
+                                const slotMinutes = parseInt(slot.time.substring(3, 5));
+                                const slotTimeString = `${slotHours.toString().padStart(2, '0')}:${slotMinutes.toString().padStart(2, '0')}`;
+
+                                // Calculate the number of days from the entry start date to the current slot date
+                                const entryStartDate = new Date(entry.start_date);
+                                entryStartDate.setDate(entryStartDate.getDate() + 1); // Add one day to the start date
+                                const slotDate = new Date(test);
+                                const timeDiff = slotDate - entryStartDate;
+                                const daysDiff = timeDiff / (1000 * 3600 * 24);
+
+                                // Check if the slot date is a multiple of 7 days from the start date
+                                if (daysDiff % 7 === 0 && slotTimeString >= entryStartTime && slotTimeString < entryEndTime) {
+                                    if (!slot.entries[entryDvoranaId]) {
+                                        slot.entries[entryDvoranaId] = [];
+                                    }
+                                    slot.entries[entryDvoranaId].push(entry);
+                                }
                             }
                         });
-
-                        //if (joinedDate >= entry.start_date && joinedDate <= entry.end_date) {
-                        //    console.log(`Processed entry: ${entry.naziv}, Start Slot: ${entry.startSlot}, Span Count: ${entry.spanCount}`);
-                        //    console.log("start_datee: ", entry.start_date);
-                        //    console.log("start_date: ", entry.end_date);
-                        //    console.log("joinedDate: ", joinedDate);   
-                        //}
-                        
                     });
                     setEntries(timeSlots)
                 })
@@ -153,7 +161,6 @@ function Pocetna() {
         const isSelectedDay = datumDate.getDate() === day && datumDate.getMonth() === monthIndex && datumDate.getFullYear() === year;
         const dayClass = (isSelectedDay ? "calendar-day selected-day" : (isToday ? "calendar-day current-day" : "calendar-day"));
         const joinedDate1 = `${year}-${(monthIndex + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-        //console.log(joinedDate1);
 
         calendarDays.push(
             <div key={day} className={dayClass} onClick={() => openPocetna(joinedDate1)} style={{cursor: 'pointer'}}>
@@ -197,7 +204,6 @@ function Pocetna() {
         const duration = endMinutes - startMinutes;
         const spanCount = Math.ceil(duration / slotDuration);
     
-        console.log(`Start Time: ${startTime}, Adjusted End Time: ${endTime} (+15min), Duration: ${duration}, Span Count: ${spanCount}`);
         return spanCount;
     }
 
