@@ -6,16 +6,17 @@ function Pocetna() {
 
     const navigate = useNavigate();
 
-    const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    const monthNames = ["January", "February", "March", "April", "May", "June",
-                        "July", "August", "September", "October", "November", "December"];
+    const daysOfWeek = ["Pon", "Uto", "Sri", "Čet", "Pet", "Sub", "Ned"];
+    const daysOfWeek_puni = ["Ponedjeljak", "Utorak", "Srijeda", "Četvrtak", "Petak", "Subota", "Nedjelja"];
+    const monthNames = ["Siječanj", "Veljača", "Ožujak", "Travanj", "Svibanj", "Lipanj",
+                        "Srpanj", "Kolovoz", "Rujan", "Listopad", "Studeni", "Prosinac"];
 
     const { datum } = useParams();
     const datumDate = datum ? new Date(datum) : new Date(); // Convert datum to a Date object or use today's date as default
     console.log(datumDate);
 
     const dayOfWeekIndex = datumDate.getDay(); // Get day of the week index (0-6)
-    const dayName = daysOfWeek[(dayOfWeekIndex === 0 ? 6 : dayOfWeekIndex - 1)]; // Adjust for week starting on Monday
+    const dayName = daysOfWeek_puni[(dayOfWeekIndex === 0 ? 6 : dayOfWeekIndex - 1)]; // Adjust for week starting on Monday
     const dayOfMonth = datumDate.getDate(); // Get day of the month (1-31)
     const monthIndex = datumDate.getMonth(); // Get month index (0-11)
     const year = datumDate.getFullYear(); // Get full year (e.g., 2023)
@@ -170,7 +171,7 @@ function Pocetna() {
         const slots = [];
         const today = new Date();
         let startTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 8, 0); // Ensure this starts at 8:00
-        const endTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 22, 0);
+        const endTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 22, 15);
     
         while (startTime < endTime) {
             const timeString = startTime.toLocaleTimeString('en-GB', {
@@ -213,28 +214,31 @@ function Pocetna() {
 
     return (
         <>
-        <p className="datum_pocetna">{dayName} {dayOfMonth} {monthNames[monthIndex]} {year}</p>
+        <h2 className="datum_pocetna">{dayName} {dayOfMonth} {monthNames[monthIndex]} {year}</h2>
+        
         <div className="calendar-navigation">
             <button onClick={goToPreviousMonth}>Previous</button>
             <p className="p_pocetna">{monthNames[currentMonth]} {currentYear}</p>
             <button onClick={goToNextMonth}>Next</button>
         </div>
+        
         <div className="calendar-grid">
             {calendarDays}
         </div>
+        <p className="dnevni_pregled">Dnevni pregled</p>
         <table>
     <thead>
         <tr>
-            <th>Time</th>
+            <td style={{textAlign: 'center', backgroundColor: '#0041b9', fontWeight: 'bold'}}>Time</td>
             {dvorane.map(dvorana => (
-                <th key={dvorana.id_dvorane}>{dvorana.naziv}</th>
+                <td key={dvorana.id_dvorane} style={{textAlign: 'center', backgroundColor: '#0041b9', fontWeight: 'bold'}}>{dvorana.naziv}</td>
             ))}
         </tr>
     </thead>
         <tbody>
             {entries.map((slot, index) => (
                 <tr key={index}>
-                    <td>{slot.time}</td>
+                    <td style={{textAlign: 'center'}}>{slot.time}</td>
                     {dvorane.map(dvorana => {
                         const entriesForDvorana = slot.entries[dvorana.id_dvorane] || [];
                         if (entriesForDvorana.length> 0) {
@@ -242,7 +246,7 @@ function Pocetna() {
                                 // Check if the entry should be rendered in this slot
                                 if (index === entry.startSlot) {
                                     return (
-                                        <td key={`${dvorana.id_dvorane}-${entryIndex}`} rowSpan={entry.spanCount} style={{backgroundColor: 'red', textAlign: 'center'}}>
+                                        <td key={`${dvorana.id_dvorane}-${entryIndex}`} rowSpan={entry.spanCount} style={{backgroundColor: entry.boja_studijskog_programa, textAlign: 'center'}}>
                                             <div>{entry.kolegij_naziv}</div>
                                             <div>{entry.studijski_program_naziv}</div>
                                             <div>{entry.korisnicko_ime}</div>

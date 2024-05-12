@@ -3,16 +3,15 @@
     align-items: center;
     justify-content: space-between;
     max-width: 290px;
-    margin-top: -60px;
+    margin-top: -80px;
 }
 
 .calendar-grid {
-    width: 10%;
+    width: 290px;
     height: auto;
     display: grid;
     grid-template-columns: repeat(7, 1fr); /* 7 days in a week */
     grid-gap: 5px; /* Adjust based on your design */
-    padding-bottom: 30px;
 }
 
  
@@ -20,7 +19,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 5px;
 }
   
 .calendar-day {
@@ -29,11 +27,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 50%;
-    aspect-ratio: 1 / 1;
-    width: 15%;
-    min-width: 15px;
-    min-height: 15px; 
 }
   
 .empty {
@@ -78,5 +71,9 @@ th:not(:first-child), td:not(:first-child) {
     justify-content: center;
     text-align: center;
     position: relative;
-    bottom: -140px;
+    bottom: -230px;
+}
+
+.dnevni_pregled {
+    text-align: center;
 }
