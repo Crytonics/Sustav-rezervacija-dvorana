@@ -9,6 +9,12 @@ export default function prijava() {
     const [CaptchaIsDone, setCaptchaDone] = useState(false);
     const [showMessage, setShowMessage] = useState(false);
 
+    const realCurrentDate = new Date(); // This remains constant, representing the real-world current date
+    const currentMonth2 = realCurrentDate.getMonth();
+    const currentYear2 = realCurrentDate.getFullYear();
+    const todayDate = realCurrentDate.toLocaleDateString('en-US', { day: 'numeric' });
+    const joinedDate = `${currentYear2}-${(currentMonth2 + 1).toString().padStart(2, '0')}-${todayDate}`;
+
 
     function onChange(){
        console.log("Changed")
@@ -46,7 +52,7 @@ export default function prijava() {
                 localStorage.setItem("token", response.data.token);
       
                 // Redirect to the desired page
-                window.location.href = "/Pocetna";
+                window.location.href = `/pocetna/${joinedDate}`;
               } else {
                 // Show error message if login fails
                 alert(response.data.message);

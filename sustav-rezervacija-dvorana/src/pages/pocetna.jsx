@@ -1,8 +1,29 @@
-import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate, useParams } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import "../css/pocetna.css"
 
 function Pocetna() {
+
+    const navigate = useNavigate();
+
+    const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+                        "July", "August", "September", "October", "November", "December"];
+
+    const { datum } = useParams();
+    const datumDate = datum ? new Date(datum) : new Date(); // Convert datum to a Date object or use today's date as default
+    console.log(datumDate);
+
+    const dayOfWeekIndex = datumDate.getDay(); // Get day of the week index (0-6)
+    const dayName = daysOfWeek[(dayOfWeekIndex === 0 ? 6 : dayOfWeekIndex - 1)]; // Adjust for week starting on Monday
+    const dayOfMonth = datumDate.getDate(); // Get day of the month (1-31)
+    const monthIndex = datumDate.getMonth(); // Get month index (0-11)
+    const year = datumDate.getFullYear(); // Get full year (e.g., 2023)
+    console.log(year);
+    console.log(monthIndex + 1);
+    console.log(dayOfMonth);
+    console.log(dayName);
+
     const [entries, setEntries] = useState([]);
     const [dvorane, setDvorane] = useState([]);
 
@@ -29,13 +50,17 @@ function Pocetna() {
     const startDayOfWeek = (firstDayOfMonth.getDay() || 7) - 1;
     const daysInMonth = lastDayOfMonth.getDate();
   
-    const daysOfWeek = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    const monthNames = ["January", "February", "March", "April", "May", "June",
-                        "July", "August", "September", "October", "November", "December"];
-  
     const calendarDays = [];
 
     const slotDuration = 15; // duration of each time slot in minutes
+
+    
+    const openPocetna = (joinedDate1) => {
+        // Navigate to a new page, passing the day as a parameter
+        navigate(`/pocetna/${joinedDate1}`);
+        //window.location.reload();
+    };
+    
 
     useEffect(() => {
         fetch("http://localhost:3000/api/dvorane")
@@ -48,8 +73,12 @@ function Pocetna() {
     }, []);
 
     useEffect(() => {
+        if (datum) {
+            const newDate = new Date(datum);
+            setCurrentDate(newDate);
+        }
         if (dvorane.length > 0) {
-            fetch(`http://localhost:3000/api/entry/${joinedDate}`)
+            fetch(`http://localhost:3000/api/entry/${datum}`)
                 .then(response => response.json())
                 .then(data => {
                     console.log("Fetched data:", data); // Initial data
@@ -87,14 +116,20 @@ function Pocetna() {
                 })
                 .catch(error => console.error('Error fetching data: ', error));
         }
-    }, [joinedDate, dvorane]); // Depend on dvorane as well
+    }, [joinedDate, dvorane, datum]); // Depend on dvorane as well
 
     const goToNextMonth = () => {
-        setCurrentDate(new Date(currentYear, currentMonth + 1, 1));
+        const newDate = new Date(currentYear, currentMonth + 1, 1);
+        const newDateString = `${newDate.getFullYear()}-${(newDate.getMonth() + 1).toString().padStart(2, '0')}-01`;
+        navigate(`/pocetna/${newDateString}`);
+        setCurrentDate(newDate);
     };
     
     const goToPreviousMonth = () => {
-        setCurrentDate(new Date(currentYear, currentMonth - 1, 1));
+        const newDate = new Date(currentYear, currentMonth - 1, 1);
+        const newDateString = `${newDate.getFullYear()}-${(newDate.getMonth() + 1).toString().padStart(2, '0')}-01`;
+        navigate(`/pocetna/${newDateString}`);
+        setCurrentDate(newDate);
     };
 
     // Calculate the number of empty slots at the end
@@ -114,9 +149,18 @@ function Pocetna() {
     // Add actual days
     for (let day = 1; day <= daysInMonth; day++) {
         const isToday = day === today && currentMonth === realCurrentMonth && currentYear === realCurrentYear;
-        const dayClass = isToday ? "calendar-day current-day" : "calendar-day";
-        calendarDays.push(<div key={day} className={dayClass}>{day}</div>);
-      }
+        const isSelectedDay = datumDate.getDate() === day && datumDate.getMonth() === monthIndex && datumDate.getFullYear() === year;
+        const dayClass = (isSelectedDay ? "calendar-day selected-day" : (isToday ? "calendar-day current-day" : "calendar-day"));
+        const joinedDate1 = `${year}-${(monthIndex + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+        //console.log(joinedDate1);
+
+        calendarDays.push(
+            <div key={day} className={dayClass} onClick={() => openPocetna(joinedDate1)} style={{cursor: 'pointer'}}>
+                {day}
+            </div>
+        );
+    }
+
     // Add empty slots at the end
     for (let i = totalDays; i < totalGridItems; i++) {
         calendarDays.push(<div key={`empty-end-${i}`} className="calendar-day empty"></div>);
@@ -169,7 +213,7 @@ function Pocetna() {
 
     return (
         <>
-        <p className="datum_pocetna">{daysOfWeek[adjustedDayOfWeekIndex]} {today} {monthNames[currentMonth2]} {currentYear2}</p>
+        <p className="datum_pocetna">{dayName} {dayOfMonth} {monthNames[monthIndex]} {year}</p>
         <div className="calendar-navigation">
             <button onClick={goToPreviousMonth}>Previous</button>
             <p className="p_pocetna">{monthNames[currentMonth]} {currentYear}</p>

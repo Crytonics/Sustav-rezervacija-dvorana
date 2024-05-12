@@ -6,6 +6,12 @@ export default function MainLayout() {
     // State to manage drawer visibility
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
+    const realCurrentDate = new Date(); // This remains constant, representing the real-world current date
+    const currentMonth2 = realCurrentDate.getMonth();
+    const currentYear2 = realCurrentDate.getFullYear();
+    const todayDate = realCurrentDate.toLocaleDateString('en-US', { day: 'numeric' });
+    const joinedDate = `${currentYear2}-${(currentMonth2 + 1).toString().padStart(2, '0')}-${todayDate}`;
+
     // Function to toggle drawer
     const toggleDrawer = () => {
         setIsDrawerOpen(!isDrawerOpen);
@@ -67,7 +73,7 @@ export default function MainLayout() {
                         <button onClick={toggleDrawer}>
                             {isDrawerOpen ? 'Close' : 'Menu'}
                         </button>
-                        <NavLink to="Pocetna" className="Pocetna">Sustav rezervacija dvorana</NavLink>
+                        <NavLink to={`/pocetna/${joinedDate}`} className="Pocetna">Sustav rezervacija dvorana</NavLink>
                         {isAuthenticated() && <NavLink className='gumb' onClick={potvrdiOdjavu}>Odjava</NavLink>}
                         {!isAuthenticated() && <NavLink to="Prijava" className="gumb">Prijava</NavLink>}
                     </div>

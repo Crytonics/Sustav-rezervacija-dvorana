@@ -41,6 +41,10 @@
 }
   
 .current-day {
+    background-color: rgb(17, 0, 255); /* Highlight the current day */
+}
+
+.selected-day {
     background-color: rgb(204, 204, 0.5); /* Highlight the current day */
 }
   
@@ -74,5 +78,5 @@ th:not(:first-child), td:not(:first-child) {
     justify-content: center;
     text-align: center;
     position: relative;
-    bottom: -200px;
+    bottom: -140px;
 }

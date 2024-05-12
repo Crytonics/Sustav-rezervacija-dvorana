@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import MainLayout from "./layouts/MainLayout";
 
@@ -37,12 +37,19 @@ import UnosDvoranaAdministrator from "./pages/Administrator/UnosDvoranaAdministr
 import AzuriranjeDvoranaAdministrator from "./pages/Administrator/AzuriranjeDvoranaAdministrator.jsx"
 
 function App() {
+  
+  const realCurrentDate = new Date(); // This remains constant, representing the real-world current date
+  const currentMonth2 = realCurrentDate.getMonth();
+  const currentYear2 = realCurrentDate.getFullYear();
+  const todayDate = realCurrentDate.toLocaleDateString('en-US', { day: 'numeric' });
+  const joinedDate = `${currentYear2}-${(currentMonth2 + 1).toString().padStart(2, '0')}-${todayDate}`;
+
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<MainLayout />}>
-          <Route index element={<Pocetna />} />
-          <Route path="pocetna" element={<Pocetna />} />
+          <Route index element={<Navigate to={`/pocetna/${joinedDate}`} replace />} />
+          <Route path="pocetna/:datum" element={<Pocetna />} />
           <Route path="prijava" element={<Prijava />} />
           <Route path="/pojedineDvoraneSvi/:id_dvorane" element={<PojedineDvoraneSvi />} />
           <Route path="pojediniKolegijiSvi" element={<PojediniKolegijiSvi />} />
