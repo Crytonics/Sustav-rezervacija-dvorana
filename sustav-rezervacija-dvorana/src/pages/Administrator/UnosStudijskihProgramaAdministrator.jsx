@@ -7,7 +7,7 @@ import { ChromePicker } from 'react-color-v2';
 export default function UnosStudijskihProgramaAdministrator() {
 
     const [displayColorPicker, setDisplayColorPicker] = useState(false);
-    const [backgroundColor, setBackgroundColor] = useState('#fff');
+    const [backgroundColor, setBackgroundColor] = useState('');
 
     const navigate = useNavigate();
 
@@ -111,13 +111,16 @@ export default function UnosStudijskihProgramaAdministrator() {
                 <label htmlFor="colorPicker">Odaberite boju:</label>
                 <br/>
                 <button type="button" className="pick-color-button" onClick={handleClick}>Pick Color</button>
+                Boja: {backgroundColor}
                     {displayColorPicker ? (
                         <div style={popover} onClick={handleColorPickerClick}>
                             <div style={cover} onClick={handleClose}/>
                             <ChromePicker 
                             color={ backgroundColor }
                             onChange={ handleChange }
-                            disableAlpha />
+                            disableAlpha 
+                            className="color-picker"
+                            required />
                         </div>
                     ) : null}
                 </div>
