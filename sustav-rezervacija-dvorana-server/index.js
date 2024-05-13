@@ -29,6 +29,7 @@ const connection = mysql.createConnection({
   user: "dlulic",
   password: "11",
   database: "dlulic",
+  timezone: 'Z'  // This sets the timezone to UTC
 });
 
 function formatTime(time) {
@@ -330,8 +331,15 @@ app.post('/api/zahtjevRezervacija', authJwt.verifyTokenAdminOrUser, function (re
 app.get('/api/rezervacije', authJwt.verifyTokenAdminOrUser, (req, res) => {
   connection.query("SELECT * FROM entry", (error, results) => {
     if (error) throw error;
+    const formattedResults = results.map(result => ({
+      ...result,
+      start_date: new Date(result.start_date).toISOString().split('T')[0],
+      end_date: result.end_date ? new Date(result.end_date).toISOString().split('T')[0] : null,
+      start_time: formatTime(result.start_time),
+      end_time: formatTime(result.end_time)
+    }));
 
-    res.send(results);
+    res.send(formattedResults);
   });
 });
 
