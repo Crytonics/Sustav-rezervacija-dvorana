@@ -106,7 +106,7 @@ function Pocetna() {
 
                                 // Calculate the number of days from the entry start date to the current slot date
                                 const entryStartDate = new Date(entry.start_date);
-                                entryStartDate.setDate(entryStartDate.getDate() + 1); // Add one day to the start date
+                                entryStartDate.setDate(entryStartDate.getDate()); // Add one day to the start date
                                 const slotDate = new Date(test);
                                 const timeDiff = slotDate - entryStartDate;
                                 const daysDiff = timeDiff / (1000 * 3600 * 24);
