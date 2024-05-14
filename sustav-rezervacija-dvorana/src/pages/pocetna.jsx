@@ -252,7 +252,7 @@ function Pocetna() {
                                 // Check if the entry should be rendered in this slot
                                 if (index === entry.startSlot) {
                                     return (
-                                        <td key={`${dvorana.id_dvorane}-${entryIndex}`} rowSpan={entry.spanCount} style={{backgroundColor: entry.boja_studijskog_programa, textAlign: 'center'}}>
+                                        <td key={`${dvorana.id_dvorane}-${entryIndex}`} rowSpan={entry.spanCount} style={{backgroundColor: entry.boja_studijskog_programa, textAlign: 'center', width: index === 0 ? '5%' : 'calc(95% / ' + dvorane.length + ')'}}>
                                             <div>{entry.kolegij_naziv}</div>
                                             <div>{entry.studijski_program_naziv}</div>
                                             <div>{entry.korisnicko_ime}</div>

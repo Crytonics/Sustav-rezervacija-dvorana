@@ -62,9 +62,9 @@ th:first-child, td:first-child {
 
 
 /* Adjust the width of the other columns */
-th:not(:first-child), td:not(:first-child) {
-    width: calc(95% / 5); /* Distribute the remaining width among the other columns */
-}
+/*th:not(:first-child), td:not(:first-child) {
+    width: calc(95% / 5); /* Distribute the remaining width among the other columns 
+}*/
 
 .datum_pocetna {
     display: flex;
