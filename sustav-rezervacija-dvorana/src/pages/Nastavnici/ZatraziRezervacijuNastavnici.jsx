@@ -44,6 +44,12 @@ export default function ZatraziRezervacijuNastavnici() {
         return true;
     };
 
+    const realCurrentDate = new Date(); // This remains constant, representing the real-world current date
+    const currentMonth2 = realCurrentDate.getMonth();
+    const currentYear2 = realCurrentDate.getFullYear();
+    const todayDate = realCurrentDate.toLocaleDateString('en-US', { day: 'numeric' });
+    const joinedDate = `${currentYear2}-${(currentMonth2 + 1).toString().padStart(2, '0')}-${todayDate}`;
+
     const navigate = useNavigate();
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -58,7 +64,7 @@ export default function ZatraziRezervacijuNastavnici() {
     const [isToggled, setIsToggled] = useState(false);
 
     const natrak_stisnuto = () => {
-        navigate("/pocetna");
+        navigate(`/pocetna/${joinedDate}`);
     }
 
     const { idEntry } = useParams()
@@ -156,7 +162,7 @@ export default function ZatraziRezervacijuNastavnici() {
             console.log("Greška prilikom unosa podataka:", error);
         }
         window.alert("Zahtjev je uspješno poslan.")
-        navigate("/pocetna");
+        navigate(`/pocetna/${joinedDate}`);
         
     }
 
