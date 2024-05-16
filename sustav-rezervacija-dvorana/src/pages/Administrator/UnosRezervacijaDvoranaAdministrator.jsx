@@ -159,9 +159,15 @@ export default function UnosRezervacijaDvoranaAdministrator() {
         const pocetak_vrijeme = event.target.Pocetak.value;
         const kraj_vrijeme = event.target.Kraj.value;
         const korisnik = event.target.nastavnik.value;
-        const status = "aktivno"
+        const status = "aktivno";
+        let temp_data = "";
 
-        const userData = { korisnik, svrha, status, pocetak_vrijeme, kraj_vrijeme, dvorana, idKolegija, idStudijskiProgram, datum, datePonavljanje, ponavljanje };
+        if (datePonavljanje === '') {
+            temp_data = datum;
+        }
+        console.log("datePonavljanje; ",temp_data); 
+
+        const userData = { korisnik, svrha, status, pocetak_vrijeme, kraj_vrijeme, dvorana, idKolegija, idStudijskiProgram, datum, temp_data, ponavljanje };
 
         console.log("Spremi podatke: ", userData);
 

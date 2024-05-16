@@ -25,11 +25,6 @@ export default function DvoraneSvi() {
             field: "svrha",
             sortable: true,
         },
-        {
-            name: "funkcije",
-            label: "Funkcije",
-            align: "center",
-        },
     ]);
 
     const handleSearchChange = (event) => {
@@ -101,9 +96,6 @@ export default function DvoraneSvi() {
                         <tr key={index}>
                             <td>{dvorana.naziv}</td>
                             <td>{dvorana.svrha}</td>
-                            <td>
-                                <button className="gumb_vidi" onClick={() => vidi_stisnuto(dvorana.id_dvorane)}>Vidi</button>
-                            </td>
                         </tr>
                     ))}
                 </tbody>

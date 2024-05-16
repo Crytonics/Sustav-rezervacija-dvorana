@@ -183,7 +183,7 @@ app.post('/api/unosEntry', authJwt.verifyTokenAdminOrUser, function (request, re
 // Unos entry Administrator (tablica "entry")
 app.post('/api/unosEntryAdmin', authJwt.verifyTokenAdmin, function (request, response) {
   const data = request.body;
-  const endDate = data.datePonavljanje || null; // This will set endDate to null if datePonavljanje is undefined, empty, or false
+  const endDate = data.temp_data || null; // This will set endDate to null if datePonavljanje is undefined, empty, or false
   const entry = [[data.id_entry, "", data.svrha, data.status, data.pocetak_vrijeme, data.kraj_vrijeme, data.dvorana, data.korisnik, data.idKolegija, data.idStudijskiProgram, data.datum, endDate, data.ponavljanje]]
   connection.query('INSERT INTO entry (id_entry, naziv, svrha, status, start_time, end_time, id_dvorane, id_korisnik, id_kolegij, id_studijskiProgrami, start_date, end_date, ponavljanje) VALUES ?', [entry], function (error, results, fields) {
     if (error) throw error;
