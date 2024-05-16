@@ -209,7 +209,6 @@ function Pocetna() {
 
     function calculateStartSlot(entryStartTime, timeSlots) {
         const entryStartMinutes = timeToMinutes(entryStartTime);
-        console.log("ES: ", dvorane.length);
         for (let i = 0; i < timeSlots.length; i++) {
             let slotTimeMinutes = timeToMinutes(timeSlots[i].time);
             if (slotTimeMinutes >= entryStartMinutes) {
