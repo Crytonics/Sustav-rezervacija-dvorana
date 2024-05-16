@@ -209,6 +209,7 @@ function Pocetna() {
 
     function calculateStartSlot(entryStartTime, timeSlots) {
         const entryStartMinutes = timeToMinutes(entryStartTime);
+        console.log("ES: ", dvorane.length);
         for (let i = 0; i < timeSlots.length; i++) {
             let slotTimeMinutes = timeToMinutes(timeSlots[i].time);
             if (slotTimeMinutes >= entryStartMinutes) {
@@ -237,7 +238,7 @@ function Pocetna() {
         <tr>
             <td style={{textAlign: 'center', backgroundColor: '#0041b9', fontWeight: 'bold'}}>Time</td>
             {dvorane.map(dvorana => (
-                <td key={dvorana.id_dvorane} style={{textAlign: 'center', backgroundColor: '#0041b9', fontWeight: 'bold'}}>{dvorana.naziv}</td>
+                <td key={dvorana.id_dvorane} style={{textAlign: 'center', backgroundColor: '#0041b9', fontWeight: 'bold',  width: 'calc(95% / ' + dvorane.length + ')'}}>{dvorana.naziv}</td>
             ))}
         </tr>
     </thead>
@@ -252,7 +253,7 @@ function Pocetna() {
                                 // Check if the entry should be rendered in this slot
                                 if (index === entry.startSlot) {
                                     return (
-                                        <td key={`${dvorana.id_dvorane}-${entryIndex}`} rowSpan={entry.spanCount} style={{backgroundColor: entry.boja_studijskog_programa, textAlign: 'center', width: index === 0 ? '5%' : 'calc(95% / ' + dvorane.length + ')'}}>
+                                        <td key={`${dvorana.id_dvorane}-${entryIndex}`} rowSpan={entry.spanCount} style={{backgroundColor: entry.boja_studijskog_programa, textAlign: 'center'}}>
                                             <div>{entry.kolegij_naziv}</div>
                                             <div>{entry.studijski_program_naziv}</div>
                                             <div>{entry.korisnicko_ime}</div>
