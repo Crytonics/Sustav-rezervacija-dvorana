@@ -29,6 +29,7 @@ const connection = mysql.createConnection({
   user: "dlulic",
   password: "11",
   database: "dlulic",
+  timezone: 'Z'  // This sets the timezone to UTC
 });
 
 function formatTime(time) {
@@ -133,8 +134,8 @@ app.post('/api/unosKorisnika', authJwt.verifyTokenAdmin, function (request, resp
 // Unos novog studijskog programa (tablica "studijskiProgrami")
 app.post('/api/unosStudijskogPrograma', authJwt.verifyTokenAdmin, function (request, response) {
   const data = request.body;
-  const studijskiprogram = [[data.id_StudijskogPrograma, data.naziv_studija, "1"]]
-  connection.query('INSERT INTO studijskiProgrami (id_StudijskogPrograma, naziv, aktivan) VALUES ?',
+  const studijskiprogram = [[data.id_StudijskogPrograma, data.naziv_studija, data.backgroundColor, "1"]]
+  connection.query('INSERT INTO studijskiProgrami (id_StudijskogPrograma, naziv, boja, aktivan) VALUES ?',
   [studijskiprogram], function (error, results, fields) {
     if (error) throw error;
     return response.send({ error: false, data: results, message: 'Studijski program je dodan.' });
@@ -182,7 +183,7 @@ app.post('/api/unosEntry', authJwt.verifyTokenAdminOrUser, function (request, re
 // Unos entry Administrator (tablica "entry")
 app.post('/api/unosEntryAdmin', authJwt.verifyTokenAdmin, function (request, response) {
   const data = request.body;
-  const endDate = data.datePonavljanje || null; // This will set endDate to null if datePonavljanje is undefined, empty, or false
+  const endDate = data.temp_data || null; // This will set endDate to null if datePonavljanje is undefined, empty, or false
   const entry = [[data.id_entry, "", data.svrha, data.status, data.pocetak_vrijeme, data.kraj_vrijeme, data.dvorana, data.korisnik, data.idKolegija, data.idStudijskiProgram, data.datum, endDate, data.ponavljanje]]
   connection.query('INSERT INTO entry (id_entry, naziv, svrha, status, start_time, end_time, id_dvorane, id_korisnik, id_kolegij, id_studijskiProgrami, start_date, end_date, ponavljanje) VALUES ?', [entry], function (error, results, fields) {
     if (error) throw error;
@@ -209,15 +210,43 @@ app.put('/api/odbaciEntry/:id_entry', authJwt.verifyTokenAdmin, function (reques
 });
 
 // Prelged/Dohvati zauzeća dvorane(tablica "entry")
-app.get("/api/entry/:id", (req, res) => {
-  const { id } = req.params;
+app.get("/api/entry/:joinedDate", (req, res) => {
+  const { joinedDate } = req.params;
 
   connection.query(
-      "SELECT id_entry, naziv, tip, opis, status, start_time, end_time, id_dvorane, id_korisnik, id_kolegij, id_studijskiProgrami WHERE id_dvorane = ? AND status = 'aktivan'",
-      [id],
-      (error, results) => {
+        `SELECT
+        e.id_entry,
+        e.id_korisnik,
+        CONCAT(koris.ime, ' ', koris.prezime) AS korisnicko_ime,
+        kole.naziv AS kolegij_naziv,
+        stud.naziv AS studijski_program_naziv,
+        stud.boja AS boja_studijskog_programa,
+        e.id_kolegij,
+        e.id_dvorane,
+        e.start_date,
+        e.end_date,
+        e.start_time,
+        e.end_time,
+        e.status,
+        e.svrha,
+        e.naziv,
+        e.ponavljanje,
+        e.id_studijskiProgrami
+      FROM entry e
+      INNER JOIN korisnici koris ON e.id_korisnik = koris.id_korisnik
+      INNER JOIN kolegij kole ON e.id_kolegij = kole.id_kolegija
+      INNER JOIN studijskiProgrami stud ON e.id_studijskiProgrami = stud.id_studijskogPrograma
+      WHERE e.status = 'aktivno' AND e.start_date <= ? AND e.end_date >= ?`,
+      [joinedDate, joinedDate], (error, results) => {
           if (error) throw error;
-          res.send(results);
+          const formattedResults = results.map(result => ({
+            ...result,
+            start_date: new Date(result.start_date).toISOString().split('T')[0],
+            end_date: result.end_date ? new Date(result.end_date).toISOString().split('T')[0] : null,
+            start_time: formatTime(result.start_time),
+            end_time: formatTime(result.end_time)
+          }));
+          res.send(formattedResults);
       }
   );
 });
@@ -302,8 +331,15 @@ app.post('/api/zahtjevRezervacija', authJwt.verifyTokenAdminOrUser, function (re
 app.get('/api/rezervacije', authJwt.verifyTokenAdminOrUser, (req, res) => {
   connection.query("SELECT * FROM entry", (error, results) => {
     if (error) throw error;
+    const formattedResults = results.map(result => ({
+      ...result,
+      start_date: new Date(result.start_date).toISOString().split('T')[0],
+      end_date: result.end_date ? new Date(result.end_date).toISOString().split('T')[0] : null,
+      start_time: formatTime(result.start_time),
+      end_time: formatTime(result.end_time)
+    }));
 
-    res.send(results);
+    res.send(formattedResults);
   });
 });
 

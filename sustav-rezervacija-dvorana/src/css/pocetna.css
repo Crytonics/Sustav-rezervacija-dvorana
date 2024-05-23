@@ -3,16 +3,15 @@
     align-items: center;
     justify-content: space-between;
     max-width: 290px;
-    margin-top: -60px;
+    margin-top: -80px;
 }
 
 .calendar-grid {
-    width: 10%;
+    width: 290px;
     height: auto;
     display: grid;
     grid-template-columns: repeat(7, 1fr); /* 7 days in a week */
     grid-gap: 5px; /* Adjust based on your design */
-    padding-bottom: 30px;
 }
 
  
@@ -20,7 +19,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 5px;
 }
   
 .calendar-day {
@@ -29,11 +27,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 50%;
-    aspect-ratio: 1 / 1;
-    width: 15%;
-    min-width: 15px;
-    min-height: 15px; 
 }
   
 .empty {
@@ -41,6 +34,10 @@
 }
   
 .current-day {
+    background-color: rgb(17, 0, 255); /* Highlight the current day */
+}
+
+.selected-day {
     background-color: rgb(204, 204, 0.5); /* Highlight the current day */
 }
   
@@ -66,7 +63,7 @@ th:first-child, td:first-child {
 
 /* Adjust the width of the other columns */
 th:not(:first-child), td:not(:first-child) {
-    width: calc(95% / 5); /* Distribute the remaining width among the other columns */
+    width: calc(95% / 7); 
 }
 
 .datum_pocetna {
@@ -74,5 +71,13 @@ th:not(:first-child), td:not(:first-child) {
     justify-content: center;
     text-align: center;
     position: relative;
-    bottom: -200px;
+    bottom: -230px;
+}
+
+.dnevni_pregled {
+    text-align: center;
+}
+.tr_naziv {
+    background-color: #0041b9;
+    font-weight: 'bold';
 }

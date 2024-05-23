@@ -1,6 +1,5 @@
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
-import "../../css/pojedineDvorane.css"
 
 export default function PojediniKolegijiSvi() {
 
@@ -119,7 +118,7 @@ export default function PojediniKolegijiSvi() {
         </div>
         <table>
             <thead>
-                <tr>
+                <tr className='tr_naziv'>
                 <th className="th_pocetna">Time</th>
                 <th className="th_pocetna">{daysOfWeek[0]}</th>
                 <th className="th_pocetna">{daysOfWeek[1]}</th>

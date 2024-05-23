@@ -26,11 +26,6 @@ export default function PojediniKolegijiPoStudijimaSvi() {
             field: "studijski_program",
             sortable: true,
         },
-        {
-            name: "funkcije",
-            label: "Funkcije",
-            align: "center",
-        }
     ]);
 
     const { idStudProg } = useParams()
@@ -92,7 +87,7 @@ export default function PojediniKolegijiPoStudijimaSvi() {
     
                 <table>
                     <thead>
-                        <tr>
+                        <tr className='tr_naziv'>
                             {filteredStupci.length > 0 && 
                             filteredStupci.map(stupc => (
                                 <th key={stupc.label}>{stupc.label}</th>
@@ -105,9 +100,6 @@ export default function PojediniKolegijiPoStudijimaSvi() {
                             <td>{kolegij.naziv_kolegija }</td>
                             <td>{kolegij.naziv_studijskog_programa}</td>
                             
-                            <td>
-                            <button className="gumb_vidi" onClick={() => vidi_stisnuto(kolegij.id_kolegija)}>Vidi</button>
-                            </td>
                         </tr>
                     ))}
                 </tbody>

@@ -44,6 +44,12 @@ export default function UnosRezervacijaDvoranaAdministrator() {
         return true;
     };
 
+    const realCurrentDate = new Date(); // This remains constant, representing the real-world current date
+    const currentMonth2 = realCurrentDate.getMonth();
+    const currentYear2 = realCurrentDate.getFullYear();
+    const todayDate = realCurrentDate.toLocaleDateString('en-US', { day: 'numeric' });
+    const joinedDate = `${currentYear2}-${(currentMonth2 + 1).toString().padStart(2, '0')}-${todayDate}`;
+
     const navigate = useNavigate();
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -59,7 +65,7 @@ export default function UnosRezervacijaDvoranaAdministrator() {
     const [isToggled, setIsToggled] = useState(false);
 
     const natrak_stisnuto = () => {
-        navigate("/pocetna");
+        navigate(`/pocetna/${joinedDate}`);
     }
 
     const { idEntry } = useParams()
@@ -153,9 +159,15 @@ export default function UnosRezervacijaDvoranaAdministrator() {
         const pocetak_vrijeme = event.target.Pocetak.value;
         const kraj_vrijeme = event.target.Kraj.value;
         const korisnik = event.target.nastavnik.value;
-        const status = "aktivno"
+        const status = "aktivno";
+        let temp_data = "";
 
-        const userData = { korisnik, svrha, status, pocetak_vrijeme, kraj_vrijeme, dvorana, idKolegija, idStudijskiProgram, datum, datePonavljanje, ponavljanje };
+        if (datePonavljanje === '') {
+            temp_data = datum;
+        }
+        console.log("datePonavljanje; ",temp_data); 
+
+        const userData = { korisnik, svrha, status, pocetak_vrijeme, kraj_vrijeme, dvorana, idKolegija, idStudijskiProgram, datum, temp_data, ponavljanje };
 
         console.log("Spremi podatke: ", userData);
 
@@ -171,7 +183,7 @@ export default function UnosRezervacijaDvoranaAdministrator() {
             console.log("Greška prilikom unosa podataka:", error);
         }
         window.alert("Zahtjev je uspješno poslan.")
-        navigate("/pocetna");
+        navigate(`/pocetna/${joinedDate}`);
         
     }
 

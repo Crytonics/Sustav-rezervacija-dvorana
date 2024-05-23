@@ -135,7 +135,7 @@ export default function PregledSvojihKolegijaNastavnici() {
 
             <table>
                 <thead>
-                    <tr>
+                    <tr className='tr_naziv'>
                         {filteredStupci.length > 0 && 
                             filteredStupci.map(stupc => (
                                 <th key={stupc.label}>{stupc.label}</th>
