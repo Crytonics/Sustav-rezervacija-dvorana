@@ -107,7 +107,7 @@ function Pocetna() {
                                 // Calculate the number of days from the entry start date to the current slot date
                                 const entryStartDate = new Date(entry.start_date);
                                 entryStartDate.setDate(entryStartDate.getDate()); // Add one day to the start date
-                                const slotDate = new Date(test);
+                                const slotDate = new Date(datum);
                                 const timeDiff = slotDate - entryStartDate;
                                 const daysDiff = timeDiff / (1000 * 3600 * 24);
 
@@ -252,7 +252,7 @@ function Pocetna() {
                                 // Check if the entry should be rendered in this slot
                                 if (index === entry.startSlot) {
                                     return (
-                                        <td key={`${dvorana.id_dvorane}-${entryIndex}`} rowSpan={entry.spanCount} style={{backgroundColor: entry.boja_studijskog_programa, textAlign: 'center'}}>
+                                        <td key={`${dvorana.id_dvorane}-${entryIndex}`} rowSpan={entry.spanCount} style={{fontWeight: "bold", backgroundColor: entry.boja_studijskog_programa, textAlign: 'center'}}>
                                             <div>{entry.kolegij_naziv}</div>
                                             <div>{entry.studijski_program_naziv}</div>
                                             <div>{entry.korisnicko_ime}</div>
