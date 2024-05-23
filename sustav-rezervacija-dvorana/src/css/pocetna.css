@@ -77,3 +77,7 @@ th:not(:first-child), td:not(:first-child) {
 .dnevni_pregled {
     text-align: center;
 }
+.tr_naziv {
+    background-color: #0041b9;
+    font-weight: 'bold';
+}

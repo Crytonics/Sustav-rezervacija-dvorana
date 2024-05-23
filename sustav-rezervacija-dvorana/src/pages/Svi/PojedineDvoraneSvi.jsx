@@ -118,7 +118,7 @@ export default function PojedineDvoraneSvi() {
         </div>
         <table>
             <thead>
-                <tr>
+                <tr className='tr_naziv'>
                 <th className="th_pocetna">Time</th>
                 <th className="th_pocetna">{daysOfWeek[0]}</th>
                 <th className="th_pocetna">{daysOfWeek[1]}</th>
