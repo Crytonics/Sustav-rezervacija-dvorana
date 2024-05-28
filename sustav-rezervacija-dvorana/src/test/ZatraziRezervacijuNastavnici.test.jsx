@@ -42,9 +42,10 @@ describe('ZatraziRezervacijuNastavnici Component', () => {
         jest.restoreAllMocks();
     });
 
-    test('renders component and fetches data', async () => {
+    test('prikazuje komponentu i dohvaća podatke', async () => {
         await act(async () => {
             render(
+
                 <Router>
                     <ZatraziRezervacijuNastavnici />
                 </Router>
@@ -60,8 +61,9 @@ describe('ZatraziRezervacijuNastavnici Component', () => {
         expect(screen.getByText('Ponavljanje do:')).toBeInTheDocument();
     });
 
-    test('handles form submission', async () => {
+    test('obradjuje formu', async () => {
         axios.post.mockResolvedValue({});
+
 
         await act(async () => {
             render(

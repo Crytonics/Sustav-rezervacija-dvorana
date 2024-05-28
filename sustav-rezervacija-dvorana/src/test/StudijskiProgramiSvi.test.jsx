@@ -17,9 +17,10 @@ describe('StudijskiProgramiSvi Component', () => {
         axios.get.mockResolvedValue({ data: mockStudijskiProgrami });
     });
 
-    test('renders component and fetches data', async () => {
+    test('prikazuje komponentu i dohvaća podatke', async () => {
         await act(async () => {
             render(
+
                 <Router>
                     <StudijskiProgramiSvi />
                 </Router>
@@ -36,9 +37,10 @@ describe('StudijskiProgramiSvi Component', () => {
         expect(program2).toBeInTheDocument();
     });
 
-    test('filters studijski programi based on search term', async () => {
+    test('filtrira studijski programi na temelju pojma za pretraživanje', async () => {
         await act(async () => {
             render(
+
                 <Router>
                     <StudijskiProgramiSvi />
                 </Router>

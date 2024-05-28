@@ -10,8 +10,9 @@ describe('Pocetna Component', () => {
     fetch.resetMocks();
   });
 
-  test('renders the correct date header', () => {
+  test('prikazuje ispravan datumski naglasak', () => {
     fetch.mockResponseOnce(JSON.stringify({ data: 'Dnevni pregled' }));
+
 
     render(
       <Router>
@@ -23,8 +24,9 @@ describe('Pocetna Component', () => {
     expect(dateHeader).toBeInTheDocument();
   });
 
-  test('navigates to the next month', () => {
+  test('navigira na sljedeći mjesec', () => {
     fetch.mockResponseOnce(JSON.stringify({ data: 'Next month data' }));
+
 
     render(
       <Router>
@@ -38,8 +40,9 @@ describe('Pocetna Component', () => {
     // Add your assertions here to check if the month has changed
   });
 
-  test('navigates to the previous month', () => {
+  test('navigira na prethodni mjesec', () => {
     fetch.mockResponseOnce(JSON.stringify({ data: 'Previous month data' }));
+
 
     render(
       <Router>

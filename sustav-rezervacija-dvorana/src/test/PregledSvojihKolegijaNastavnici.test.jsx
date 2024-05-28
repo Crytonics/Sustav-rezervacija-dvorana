@@ -29,9 +29,10 @@ describe('PregledSvojihKolegijaNastavnici Component', () => {
         jest.restoreAllMocks();
     });
 
-    test('renders component and fetches data', async () => {
+    test('prikazuje komponentu i dohvaća podatke', async () => {
         await act(async () => {
             render(
+
                 <Router>
                     <PregledSvojihKolegijaNastavnici />
                 </Router>
@@ -48,9 +49,10 @@ describe('PregledSvojihKolegijaNastavnici Component', () => {
         expect(kolegij2).toBeInTheDocument();
     });
 
-    test('filters kolegiji based on search term', async () => {
+    test('filtrira kolegije prema pojmu za pretraživanje', async () => {
         await act(async () => {
             render(
+
                 <Router>
                     <PregledSvojihKolegijaNastavnici />
                 </Router>

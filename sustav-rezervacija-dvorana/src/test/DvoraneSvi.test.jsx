@@ -17,9 +17,10 @@ describe('DvoraneSvi Component', () => {
         axios.get.mockResolvedValue({ data: mockDvorane });
     });
 
-    test('renders component and fetches data', async () => {
+    test('prikazuje komponentu i dohvaća podatke', async () => {
         render(
             <Router>
+
                 <DvoraneSvi />
             </Router>
         );
@@ -34,9 +35,10 @@ describe('DvoraneSvi Component', () => {
         expect(dvorana2).toBeInTheDocument();
     });
 
-    test('filters dvorane based on search term', async () => {
+    test('filtrira dvorane prema pojmu za pretraživanje', async () => {
         render(
             <Router>
+
                 <DvoraneSvi />
             </Router>
         );

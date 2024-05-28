@@ -37,7 +37,7 @@ describe('DvoraneAdministrator', () => {
         jest.restoreAllMocks();
     });
 
-    test('renders the component and fetches data', async () => {
+    test('prikazuje komponentu i dohvaća podatke', async () => {
         await act(async () => {
             render(
                 <Router>
@@ -52,7 +52,7 @@ describe('DvoraneAdministrator', () => {
         expect(screen.getByText('Dvorana 2')).toBeInTheDocument();
     });
 
-    test('filters dvorane based on search term', async () => {
+    test('filtrira dvorane prema pojmu za pretraživanje', async () => {
         await act(async () => {
             render(
                 <Router>
@@ -71,7 +71,7 @@ describe('DvoraneAdministrator', () => {
         expect(screen.queryByText('Dvorana 2')).not.toBeInTheDocument();
     });
 
-    test('navigates to add dvorana page on button click', async () => {
+    test('navigira na stranicu za dodavanje dvorane nakon klika na gumb', async () => {
         let container;
         await act(async () => {
             container = render(
@@ -88,9 +88,10 @@ describe('DvoraneAdministrator', () => {
         expect(window.location.pathname).toBe('/unosDvoranaAdministrator');
     });
 
-    test('navigates to view dvorana page on button click', async () => {
+    test('navigira na stranicu za pregled dvorane nakon klika na gumb', async () => {
         await act(async () => {
             render(
+
                 <Router>
                     <DvoraneAdministrator />
                 </Router>
@@ -106,9 +107,10 @@ describe('DvoraneAdministrator', () => {
         expect(window.location.pathname).toBe('/pojedineDvoraneSvi/1');
     });
 
-    test('navigates to edit dvorana page on button click', async () => {
+    test('navigira na stranicu za uređivanje dvorane nakon klika na gumb', async () => {
         await act(async () => {
             render(
+
                 <Router>
                     <DvoraneAdministrator />
                 </Router>
@@ -124,9 +126,10 @@ describe('DvoraneAdministrator', () => {
         expect(window.location.pathname).toBe('/azuriranjeDvoranaAdministrator/1');
     });
 
-    test('deletes a dvorana on button click', async () => {
+    test('brise dvoranu nakon klika na gumb', async () => {
         axios.put.mockResolvedValue({});
         await act(async () => {
+
             render(
                 <Router>
                     <DvoraneAdministrator />

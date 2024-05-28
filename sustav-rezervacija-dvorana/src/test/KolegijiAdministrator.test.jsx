@@ -31,18 +31,20 @@ describe('KolegijiAdministrator', () => {
         jest.restoreAllMocks();
     });
 
-    test('renders the component', () => {
+    test('prikazuje komponentu', () => {
         render(
             <Router>
+
                 <KolegijiAdministrator />
             </Router>
         );
         expect(screen.getByText('Popis kolegija')).toBeInTheDocument();
     });
 
-    test('fetches and displays kolegiji', async () => {
+    test('dohvaća i prikazuje kolegije', async () => {
         await act(async () => {
             render(
+
                 <Router>
                     <KolegijiAdministrator />
                 </Router>
@@ -55,9 +57,10 @@ describe('KolegijiAdministrator', () => {
         });
     });
 
-    test('search functionality works', async () => {
+    test('funkcija za pretraživanje radi', async () => {
         await act(async () => {
             render(
+
                 <Router>
                     <KolegijiAdministrator />
                 </Router>
@@ -77,7 +80,7 @@ describe('KolegijiAdministrator', () => {
         expect(screen.queryByText('Kolegij 2')).not.toBeInTheDocument();
     });
 
-    test('navigates to add kolegij page on button click', async () => {
+    test('navigira na stranicu za dodavanje kolegija nakon klika na gumb', async () => {
         await act(async () => {
             render(
                 <Router>
@@ -93,9 +96,10 @@ describe('KolegijiAdministrator', () => {
         expect(window.location.pathname).toBe('/unosKolegijaAdministrator');
     });
 
-    test('navigates to edit kolegij page on button click', async () => {
+    test('navigira na stranicu za uređivanje kolegija nakon klika na gumb', async () => {
         await act(async () => {
             render(
+
                 <Router>
                     <KolegijiAdministrator />
                 </Router>
@@ -115,9 +119,10 @@ describe('KolegijiAdministrator', () => {
         expect(window.location.pathname).toBe('/azuriranjeKolegijaAdministrator/1');
     });
 
-    test('navigates to view kolegij page on button click', async () => {
+    test('navigira na stranicu za pregled kolegija nakon klika na gumb', async () => {
         await act(async () => {
             render(
+
                 <Router>
                     <KolegijiAdministrator />
                 </Router>

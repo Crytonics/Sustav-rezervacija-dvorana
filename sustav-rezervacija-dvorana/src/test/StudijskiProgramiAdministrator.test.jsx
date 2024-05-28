@@ -37,9 +37,10 @@ describe('StudijskiProgramiAdministrator', () => {
     jest.restoreAllMocks();
   });
 
-  test('renders StudijskiProgramiAdministrator component', async () => {
+  test('prikazuje komponentu StudijskiProgramiAdministrator', async () => {
     await act(async () => {
       render(
+
         <BrowserRouter>
           <StudijskiProgramiAdministrator />
         </BrowserRouter>
@@ -51,9 +52,10 @@ describe('StudijskiProgramiAdministrator', () => {
     expect(screen.getByText('Dodaj studij')).toBeInTheDocument();
   });
 
-  test('filters studijski programi based on search term', async () => {
+  test('filtrira studijski programi na temelju pojma za pretraživanje', async () => {
     await act(async () => {
       render(
+
         <BrowserRouter>
           <StudijskiProgramiAdministrator />
         </BrowserRouter>
@@ -69,9 +71,10 @@ describe('StudijskiProgramiAdministrator', () => {
     });
   });
 
-  test('navigates to add new program page on button click', async () => {
+  test('navigira na stranicu za dodavanje novog programu nakon klika na gumb', async () => {
     await act(async () => {
       render(
+
         <BrowserRouter>
           <StudijskiProgramiAdministrator />
         </BrowserRouter>
@@ -84,9 +87,10 @@ describe('StudijskiProgramiAdministrator', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/unosStudijskihProgramaAdministrator');
   });
 
-  test('navigates to view program page on button click', async () => {
+  test('navigira na stranicu za pregled programu nakon klika na gumb', async () => {
     await act(async () => {
       render(
+
         <BrowserRouter>
           <StudijskiProgramiAdministrator />
         </BrowserRouter>
@@ -99,9 +103,10 @@ describe('StudijskiProgramiAdministrator', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/pojediniKolegijiPoStudijimaSvi/1');
   });
 
-  test('navigates to edit program page on button click', async () => {
+  test('navigira na stranicu za uređivanje programu nakon klika na gumb', async () => {
     await act(async () => {
       render(
+
         <BrowserRouter>
           <StudijskiProgramiAdministrator />
         </BrowserRouter>
@@ -114,9 +119,10 @@ describe('StudijskiProgramiAdministrator', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/azuriranjeStudijskihProgramaAdministrator/1');
   });
 
-  test('deletes a program on button click', async () => {
+  test('brise program nakon klika na gumb', async () => {
     axios.put.mockResolvedValue({});
     axios.get.mockResolvedValueOnce({ data: studijskiProgrami }).mockResolvedValueOnce({ data: [] });
+
 
     await act(async () => {
       render(

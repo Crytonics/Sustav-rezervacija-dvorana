@@ -36,7 +36,7 @@ describe('PojediniKolegijiPoStudijimaSvi Component', () => {
         expect(kolegij2).toBeInTheDocument();
     });
 
-    test('filters kolegiji based on search term', async () => {
+    test('filtrira kolegije prema pojmu za pretraživanje', async () => {
         await act(async () => {
             render(
                 <Router>

@@ -35,9 +35,10 @@ describe('ListaKorisnikaAdministrator', () => {
     jest.restoreAllMocks();
 });
 
-  test('renders the component', async () => {
+  test('prikazuje komponentu', async () => {
     render(
       <BrowserRouter>
+
         <ListaKorisnikaAdministrator />
       </BrowserRouter>
     );
@@ -47,9 +48,10 @@ describe('ListaKorisnikaAdministrator', () => {
     expect(screen.getByText('Dodaj korisnika')).toBeInTheDocument();
   });
 
-  test('fetches and displays users', async () => {
+  test('dohvaća i prikazuje korisnike', async () => {
     await act(async () => {
         render(
+
         <BrowserRouter>
             <ListaKorisnikaAdministrator />
         </BrowserRouter>
@@ -64,9 +66,10 @@ describe('ListaKorisnikaAdministrator', () => {
     });
   });
 
-  test('navigates to add user page on button click', async () => {
+  test('navigira na stranicu za dodavanje korisnika nakon klika na gumb', async () => {
     await act(async () => {
         render(
+
         <BrowserRouter>
             <ListaKorisnikaAdministrator />
         </BrowserRouter>
@@ -81,7 +84,7 @@ describe('ListaKorisnikaAdministrator', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/UnosKorisnikaAdministrator');
   });
 
-  test('filters users based on search term', async () => {
+  test('filtrira korisnike na temelju pojma za pretraživanje', async () => {
     await act(async () => {
         render(
         <BrowserRouter>
@@ -101,9 +104,11 @@ describe('ListaKorisnikaAdministrator', () => {
     expect(screen.queryByText('user2')).not.toBeInTheDocument();
   });
 
-  test('navigates to edit user page on edit button click', async () => {
+  test('navigira na stranicu za uređivanje korisnika nakon klika na gumb', async () => {
     await act(async () => {
+
         render(
+
         <BrowserRouter>
             <ListaKorisnikaAdministrator />
         </BrowserRouter>
