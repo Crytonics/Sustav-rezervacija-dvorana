@@ -50,6 +50,15 @@ app.use(express.urlencoded({extended: true}));
 
 connection.connect();
 
+// Keep-alive query to prevent MySQL disconnection
+setInterval(() => {
+  connection.query('SELECT 1', (error) => {
+    if (error) {
+      console.error('Error with keep-alive query:', error);
+    }
+  });
+}, 60000); // Execute every 60 seconds
+
 // Dohvati sve korisnike iz tablice "korisnici"
 app.get("/api/korisnici", authJwt.verifyTokenAdmin, (req, res) => {
   connection.query("SELECT * FROM korisnici WHERE aktivan = '1'", (error, results) => {
