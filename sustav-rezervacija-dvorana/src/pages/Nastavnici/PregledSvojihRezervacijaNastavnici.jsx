@@ -212,7 +212,6 @@ export default function PregledSvojihRezervacijaNastavnici() {
                             <td>{zahtjev.ponavljanje }</td>
                             <td>{zahtjev.status }</td>
                             <td>
-                            <button className="gumb_vidi" onClick={() => vidi_stisnuto(zahtjev.id_entry)}>Vidi</button>
                             <button className="gumb_uredi" onClick={() => uredi_stisnuto(zahtjev.id_entry)}>Uredi</button>
                             </td>
                         </tr>
