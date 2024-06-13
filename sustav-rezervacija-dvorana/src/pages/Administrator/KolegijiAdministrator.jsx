@@ -165,7 +165,6 @@ export default function KolegijiAdministrator() {
                             <td>{kolegij.naziv_studijskog_programa}</td>
                             
                             <td>
-                            <button className="gumb_vidi" onClick={() => vidi_stisnuto(kolegij.id_kolegija)}>Vidi</button>
                                 <button className="gumb_uredi" onClick={() => uredi_stisnuto(kolegij.id_kolegija)}>Uredi</button>
                                 <button className="gumb_obriši" onClick={() => obrisiKorisnika(kolegij.id_kolegija)}>Izbriši</button>
                             </td>

@@ -155,7 +155,6 @@ export default function DvoraneAdministrator() {
                             <td>{dvorana.naziv}</td>
                             <td>{dvorana.svrha}</td>
                             <td>
-                                <button className="gumb_vidi" onClick={() => vidi_stisnuto(dvorana.id_dvorane)}>Vidi</button>
                                 <button className="gumb_uredi" onClick={() => uredi_stisnuto(dvorana.id_dvorane)}>Uredi</button>
                                 <button className="gumb_obriši" onClick={() => obrisiKorisnika(dvorana.id_dvorane)}>Izbriši</button>
                             </td>

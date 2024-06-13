@@ -236,7 +236,6 @@ export default function PregledRezervacijaDvoranaAdministrator() {
                             <td>{zahtjev.ponavljanje }</td>
                             <td>{zahtjev.status }</td>
                             <td>
-                            <button className="gumb_vidi" onClick={() => vidi_stisnuto(zahtjev.id_entry)}>Vidi</button>
                             <button className="gumb_uredi" onClick={() => uredi_stisnuto(zahtjev.id_entry)}>Uredi</button>
                             <button className="gumb_obriši" onClick={() => obrisiEntry(zahtjev.id_entry)}>Izbriši</button>
                             </td>
