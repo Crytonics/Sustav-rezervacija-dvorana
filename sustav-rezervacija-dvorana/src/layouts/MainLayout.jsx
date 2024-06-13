@@ -10,7 +10,7 @@ export default function MainLayout() {
     const currentMonth2 = realCurrentDate.getMonth();
     const currentYear2 = realCurrentDate.getFullYear();
     const todayDate = realCurrentDate.toLocaleDateString('en-US', { day: 'numeric' });
-    const joinedDate = `${currentYear2}-${(currentMonth2 + 1).toString().padStart(2, '0')}-${todayDate}`;
+    const joinedDate = `${currentYear2}-${(currentMonth2 + 1).toString().padStart(2, '0')}-${todayDate.toString().padStart(2, '0')}`;
 
     // Function to toggle drawer
     const toggleDrawer = () => {

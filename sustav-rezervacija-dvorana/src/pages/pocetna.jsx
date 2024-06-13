@@ -34,7 +34,7 @@ function Pocetna() {
     const today = realCurrentDate.getDate();
     const day = realCurrentDate.getDay();
     const todayDate = realCurrentDate.toLocaleDateString('en-US', { day: 'numeric' });
-    const joinedDate = `${currentYear2}-${(currentMonth2 + 1).toString().padStart(2, '0')}-${todayDate}`;
+    const joinedDate = `${currentYear2}-${(currentMonth2 + 1).toString().padStart(2, '0')}-${todayDate.toString().padStart(2, '0')}`;
   
     const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
     const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
