@@ -110,7 +110,7 @@ export default function AzuriranjeDvorane() {
                 <input type="text" id="naziv" name="naziv" value={naziv} onChange={handleNazivChange} required />
             </div>
             <div className="form-group">
-                <label htmlFor="svrha">Uloga: </label>
+                <label htmlFor="svrha">Svrha: </label>
                 <select id="svrha" name="svrha" required>
                     {uloga === "predavanje" ? (
                         <>

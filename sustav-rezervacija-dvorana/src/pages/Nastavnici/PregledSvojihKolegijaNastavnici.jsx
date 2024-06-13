@@ -64,11 +64,6 @@ export default function PregledSvojihKolegijaNastavnici() {
             field: "studijski_program",
             sortable: true,
         },
-        {
-            name: "funkcije",
-            label: "Funkcije",
-            align: "center",
-        }
     ]);
     
     const handleSearchChange = (event) => {
@@ -148,9 +143,6 @@ export default function PregledSvojihKolegijaNastavnici() {
                             <td>{kolegij.naziv_kolegija }</td>
                             <td>{kolegij.naziv_studijskog_programa}</td>
                             
-                            <td>
-                            <button className="gumb_vidi" onClick={() => vidi_stisnuto(kolegij.id_kolegija)}>Vidi</button>
-                            </td>
                         </tr>
                     ))}
                 </tbody>
