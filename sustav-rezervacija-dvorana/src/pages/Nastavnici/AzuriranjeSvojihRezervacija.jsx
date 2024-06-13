@@ -64,7 +64,7 @@ export default function AzuriranjeSvojihRezervacija() {
     const [datum, setDatum] = useState('');
     const [end_date, setEnd_date] = useState('');
     const [svrha, setSvrha] = useState('');
-    //const [id_entry, setId_entry] = useState([]);
+    const [datePonavljanje, setDatePonavljanje] = useState('');
 
     const [isToggled, setIsToggled] = useState(false);
 
@@ -134,6 +134,10 @@ export default function AzuriranjeSvojihRezervacija() {
         setSvrha(event.target.value);
     };
 
+    const handleDateChangePonavljanje = (event) => {
+        setDatePonavljanje(event.target.value);
+    };
+
     useEffect(() => {
         async function fetchInitialData() {
 
@@ -197,8 +201,15 @@ export default function AzuriranjeSvojihRezervacija() {
         const kraj_vrijeme = event.target.Kraj.value;
         const date_ponavljanje = event.target.date_ponavljanje.value;
         const status = "Azuriran zahtjev"
+        let temp_data = "";
 
-        const userData = { id_entry, status, svrha, pocetak_vrijeme, kraj_vrijeme, idDvorane, id_korisnika, idKolegija, idStudijskiProgram, datum, date_ponavljanje, ponavljanje };
+        if (datePonavljanje === '') {
+            temp_data = datum;
+        } else {
+            temp_data = datePonavljanje;
+        }
+
+        const userData = { id_entry, status, svrha, pocetak_vrijeme, kraj_vrijeme, idDvorane, id_korisnika, idKolegija, idStudijskiProgram, datum, temp_data, ponavljanje };
 
 
         console.log("USER DATA: ", userData);
@@ -279,7 +290,7 @@ export default function AzuriranjeSvojihRezervacija() {
             </div>
             <div className="form-group">
                 <label htmlFor="Datum">Ponavljanje do: </label>
-                <input type="date" id="date_ponavljanje" name="date_ponavljanje" value={end_date} onChange={handleDateChange_end_date} required />
+                <input type="date" id="date_ponavljanje" name="date_ponavljanje" value={datePonavljanje || ''} onChange={handleDateChangePonavljanje} />
             </div>
             <div className="form-group toggle-group">
             <label htmlFor="toggleInput" style={{marginLeft: '10px'}}>Ponavljanje</label>

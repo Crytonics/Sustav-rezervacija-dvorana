@@ -60,6 +60,7 @@ export default function ZatraziRezervacijuNastavnici() {
     const [entry, setEntry] = useState([]);
     const [ponavljanje, setPonavljanje] = useState([]);
     const [id_korisnika, setId_korisnika] = useState([]);
+    const [datePonavljanje, setDatePonavljanje] = useState('');
 
     const [isToggled, setIsToggled] = useState(false);
 
@@ -95,6 +96,10 @@ export default function ZatraziRezervacijuNastavnici() {
             setPonavljanje(newIsToggled ? "1" : "0");
             return newIsToggled;
         });
+    };
+
+    const handleDateChange = (event) => {
+        setDatePonavljanje(event.target.value);
     };
 
     useEffect(() => {
@@ -147,8 +152,15 @@ export default function ZatraziRezervacijuNastavnici() {
         const kraj_vrijeme = event.target.Kraj.value;
         const date_ponavljanje = event.target.date_ponavljanje.value;
         const status = "zahtjev"
+        let temp_data = "";
 
-        const userData = { svrha, status, pocetak_vrijeme, kraj_vrijeme, dvorana, id_korisnika, idKolegija, idStudijskiProgram, datum, date_ponavljanje, ponavljanje };
+        if (datePonavljanje === '') {
+            temp_data = datum;
+        } else {
+            temp_data = datePonavljanje;
+        } 
+
+        const userData = { svrha, status, pocetak_vrijeme, kraj_vrijeme, dvorana, id_korisnika, idKolegija, idStudijskiProgram, datum, temp_data, ponavljanje };
 
         posalji_podatke(userData);
     }
@@ -220,8 +232,14 @@ export default function ZatraziRezervacijuNastavnici() {
                 </select>
             </div>
             <div className="form-group">
-                <label htmlFor="Datum">Ponavljanje do: </label>
-                <input type="date" id="date_ponavljanje" name="date_ponavljanje" required />
+                <label htmlFor="date_ponavljanje">Ponavljanje do: </label>
+                <input
+                    type="date"
+                    id="date_ponavljanje"
+                    name="date_ponavljanje"
+                    value={datePonavljanje || ''}
+                    onChange={handleDateChange}
+                    />
             </div>
             <div className="form-group toggle-group">
             <label htmlFor="toggleInput" style={{marginLeft: '10px'}}>Ponavljanje</label>
