@@ -80,11 +80,11 @@ export default function UnosDvoranaAdministrator() {
         <div className="unos-korisnika-container">
         <form className="login-form" onSubmit={spremi_podatke}>
             <div className="form-group">
-                <label htmlFor="naziv">Ime: </label>
+                <label htmlFor="naziv">Naziv: </label>
                 <input type="text" id="naziv" name="naziv" required />
             </div>
             <div className="form-group">
-                <label htmlFor="svrha">Uloga: </label>
+                <label htmlFor="svrha">Svrha: </label>
                 <select id="svrha" name="svrha" required>
                     <option value="predavanje">Predavanje</option>
                     <option value="ispit">Ispit</option>

@@ -116,14 +116,14 @@ export default function PregledSvojihRezervacijaNastavnici() {
     };
 
     const filteredZahtjevi = zahtjevi.filter(zahtjev =>
-        zahtjev.kolegij.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        zahtjev.dvorana.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        zahtjev.datum.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        zahtjev.vrijeme.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        zahtjev.svrha.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        zahtjev.ponavljanje.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        zahtjev.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        zahtjev.id_kolegij.toLowerCase()
+        (zahtjev.kolegij && zahtjev.kolegij.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (zahtjev.dvorana && zahtjev.dvorana.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (zahtjev.datum && zahtjev.datum.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (zahtjev.vrijeme && zahtjev.vrijeme.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (zahtjev.svrha && zahtjev.svrha.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (zahtjev.ponavljanje && zahtjev.ponavljanje.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (zahtjev.status && zahtjev.status.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (zahtjev.id_kolegij && zahtjev.id_kolegij.toString().toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     const filteredStupci = stupci.filter(stupc =>

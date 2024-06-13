@@ -182,7 +182,8 @@ app.post('/api/unosDvorane', authJwt.verifyTokenAdmin, function (request, respon
 // Unos entry (tablica "entry")
 app.post('/api/unosEntry', authJwt.verifyTokenAdminOrUser, function (request, response) {
   const data = request.body;
-  const entry = [[data.id_entry, "", data.svrha, data.status, data.pocetak_vrijeme, data.kraj_vrijeme, data.dvorana, data.id_korisnika, data.idKolegija, data.idStudijskiProgram, data.datum, data.date_ponavljanje, data.ponavljanje]]
+  const endDate = data.temp_data || null; // This will set endDate to null if datePonavljanje is undefined, empty, or false
+  const entry = [[data.id_entry, "", data.svrha, data.status, data.pocetak_vrijeme, data.kraj_vrijeme, data.dvorana, data.id_korisnika, data.idKolegija, data.idStudijskiProgram, data.datum, endDate, data.ponavljanje]]
   connection.query('INSERT INTO entry (id_entry, naziv, svrha, status, start_time, end_time, id_dvorane, id_korisnik, id_kolegij, id_studijskiProgrami, start_date, end_date, ponavljanje) VALUES ?', [entry], function (error, results, fields) {
     if (error) throw error;
     return response.send({ error: false, data: results, message: 'Korisnik je dodan.' });
@@ -741,8 +742,7 @@ app.post('/api/unosKolegija', authJwt.verifyTokenAdmin, function (request, respo
 app.put('/api/azuriranjeEntry/:id_entry', authJwt.verifyTokenAdminOrUser, function (request, response) {
   const id_entry = request.params.id_entry;
   const data = request.body;
-
-  const endDate = data.date_ponavljanje || null;
+  const endDate = data.temp_data || null; // This will set endDate to null if datePonavljanje is undefined, empty, or false
 
   const sqlQuery = `
     UPDATE entry 
@@ -770,7 +770,7 @@ app.put('/api/azuriranjeEntry/:id_entry', authJwt.verifyTokenAdminOrUser, functi
     data.idKolegija, 
     data.idStudijskiProgram, 
     data.datum, 
-    data.endDate, 
+    endDate, 
     data.ponavljanje,
     id_entry
   ];

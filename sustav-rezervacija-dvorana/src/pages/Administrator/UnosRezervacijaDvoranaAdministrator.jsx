@@ -164,12 +164,11 @@ export default function UnosRezervacijaDvoranaAdministrator() {
 
         if (datePonavljanje === '') {
             temp_data = datum;
-        }
-        console.log("datePonavljanje; ",temp_data); 
+        } else {
+            temp_data = datePonavljanje;
+        } 
 
         const userData = { korisnik, svrha, status, pocetak_vrijeme, kraj_vrijeme, dvorana, idKolegija, idStudijskiProgram, datum, temp_data, ponavljanje };
-
-        console.log("Spremi podatke: ", userData);
 
         posalji_podatke(userData);
     }
