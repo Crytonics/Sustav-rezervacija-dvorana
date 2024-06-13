@@ -124,17 +124,16 @@ export default function OdobravanjeTerminaDvoranaAdministrator() {
     };
 
     const filteredZahtjevi = zahtjevi.filter(zahtjev =>
-        zahtjev.korisnicko_ime.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        zahtjev.kolegij.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        zahtjev.dvorana.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        zahtjev.datum.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        zahtjev.vrijeme.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        zahtjev.svrha.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        zahtjev.ponavljanje.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        zahtjev.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        zahtjev.id_kolegij.toLowerCase() ||
-        zahtjev.id_entry.toLowerCase()
-        
+        (zahtjev.korisnicko_ime && zahtjev.korisnicko_ime.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (zahtjev.kolegij && zahtjev.kolegij.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (zahtjev.dvorana && zahtjev.dvorana.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (zahtjev.datum && zahtjev.datum.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (zahtjev.vrijeme && zahtjev.vrijeme.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (zahtjev.svrha && zahtjev.svrha.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (zahtjev.ponavljanje && zahtjev.ponavljanje.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (zahtjev.status && zahtjev.status.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (zahtjev.id_kolegij && zahtjev.id_kolegij.toString().toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (zahtjev.id_entry && zahtjev.id_entry.toString().toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     const filteredStupci = stupci.filter(stupc =>
@@ -149,6 +148,7 @@ export default function OdobravanjeTerminaDvoranaAdministrator() {
         try {
             const response = await axios.put(`http://localhost:3000/api/odobriEntry/${id_entry}`, {}, {headers});
             window.alert("Rezervacija dvorana je omogućena.")
+            window.location.reload();
         } catch (error) {
             console.log("Greška prilikom ažuriranja rezervacije:", error);
             window.alert("Došlo je do greške prilikom ažuriranja rezervacije.");
